@@ -62,7 +62,7 @@ power_tests = prop_powers 2 0 &&
 -- D
 -- quickCheck prop_powers failed
 -- This is due to the fact that our power functions won't accept negative
--- values.
+-- values for k.
 prop_powers' :: Integer -> Integer -> Bool
 prop_powers' n k = (power n (abs k) == power1 n (abs k)) &&
                 (power1 n (abs k) == power2 n (abs k)) &&
