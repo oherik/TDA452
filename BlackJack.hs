@@ -22,13 +22,32 @@ module BlackJack where
   empty = Empty
 
   value :: Hand -> Integer
+  value Empty = 0
+  value (Add card hand) | valueCard card + value hand > 21 =
+      valueCard card + value hand - 10*numberOfAces hand
+                        | otherwise  =
+        valueCard card + value hand
+  --  Integer noAces = numberOfAces hand
+  --  if value > 21 && noAces > 0
+  --    then value - 10*noAces
+  --  else
+  --    then value
 
   valueRank :: Rank -> Integer
+  valueRank Jack = 10
+  valueRank Queen = 10
+  valueRank King = 10
+  valueRank Ace = 11
+  valueRank x = x
 
   valueCard ::  Card -> Integer
+  valueCard card = valueRank (rank card)
 
   numberOfAces :: Hand -> Integer
+  numberOfAces Empty = 0
+  numberOfAces (Add {Ace Suit} hand) = 1 + numberOfAces hand
+  numberOfAces (Add {Rank Suit} hand) = 0 + numberOfAces hand
 
-  gameOver :: Hand -> Bool
+  -- gameOver :: Hand -> Bool
 
-  winner :: Hand -> Hand -> Player
+  -- winner :: Hand -> Hand -> Player
