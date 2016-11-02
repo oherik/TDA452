@@ -49,6 +49,10 @@ module BlackJack where
           then 1 + numberOfAces hand
           else 0 + numberOfAces hand
 
-  -- gameOver :: Hand -> Bool
+  gameOver :: Hand -> Bool
+  gameOver hand = if val > 21
+                    then True
+                  else False
+                    where val = value hand
 
   -- winner :: Hand -> Hand -> Player
