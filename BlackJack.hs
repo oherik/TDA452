@@ -18,25 +18,20 @@ module BlackJack where
 
   -- 3.3
 
+  numericValue :: Hand -> Integer
+  numericValue Empty = 0
+  numericValue (Add card hand) = valueCard card + numericValue hand
+
   empty :: Hand
   empty = Empty
 
   value :: Hand -> Integer
   value Empty = 0
-  value (Add Card hand) =
-              if nonAcedValue hand > 21
-                then  nonAcedValue hand - 10*numberOfAces hand
-                    else nonAcedValue hand
-
-
-nonAcedValue :: Hand -> Integer
-nonAcedValue Empty = 0
-nonAcedValue (Add card hand) = valueCard card + nonAcedValue hand
-  --  Integer noAces = numberOfAces hand
-  --  if value > 21 && noAces > 0
-  --    then value - 10*noAces
-  --  else
-  --    then value
+  value hand =
+              if val > 21
+                then  val - 10*numberOfAces hand
+              else val
+                where val = numericValue hand
 
   valueRank :: Rank -> Integer
   valueRank Jack = 10
