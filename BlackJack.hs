@@ -38,7 +38,7 @@ module BlackJack where
   valueRank Queen = 10
   valueRank King = 10
   valueRank Ace = 11
-  valueRank x = x
+  valueRank (Numeric int) = int
 
   valueCard ::  Card -> Integer
   valueCard card = valueRank (rank card)
@@ -47,7 +47,7 @@ module BlackJack where
   numberOfAces Empty = 0
   numberOfAces (Add card hand) = if(rank card == Ace)
           then 1 + numberOfAces hand
-          else then 0 + numberOfAces hand
+          else 0 + numberOfAces hand
 
   -- gameOver :: Hand -> Bool
 
