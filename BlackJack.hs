@@ -45,8 +45,9 @@ module BlackJack where
 
   numberOfAces :: Hand -> Integer
   numberOfAces Empty = 0
-  numberOfAces (Add {Ace Suit} hand) = 1 + numberOfAces hand
-  numberOfAces (Add {Rank Suit} hand) = 0 + numberOfAces hand
+  numberOfAces (Add card hand) = if(rank card == Ace)
+          then 1 + numberOfAces hand
+          else then 0 + numberOfAces hand
 
   -- gameOver :: Hand -> Bool
 
