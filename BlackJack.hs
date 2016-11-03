@@ -55,4 +55,12 @@ module BlackJack where
                   else False
                     where val = value hand
 
-  -- winner :: Hand -> Hand -> Player
+  winner :: Hand -> Hand -> Player
+  winner guestHand bankHand
+                      | gameOverhand == True = Bank
+                      | val1 == val2 = Bank
+                      | val1 > val2 = Guest
+                      | otherwise = Bank
+                      where gameOverhand = gameOver guestHand
+                            val1 = value guestHand
+                            val2 = value bankHand
