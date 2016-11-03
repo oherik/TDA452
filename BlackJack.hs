@@ -18,19 +18,18 @@ module BlackJack where
 
   -- 3.3
 
+  empty :: Hand
+  empty = Empty
+
   numericValue :: Hand -> Integer
   numericValue Empty = 0
   numericValue (Add card hand) = valueCard card + numericValue hand
 
-  empty :: Hand
-  empty = Empty
-
   value :: Hand -> Integer
   value Empty = 0
-  value hand =
-              if val > 21
-                then  val - 10*numberOfAces hand
-              else val
+  value hand =  if val > 21
+                	then  val - 10*numberOfAces hand
+              	else val
                 where val = numericValue hand
 
   valueRank :: Rank -> Integer
@@ -53,7 +52,7 @@ module BlackJack where
   gameOver hand = if val > 21
                     then True
                   else False
-                    where val = value hand
+                  where val = value hand
 
   winner :: Hand -> Hand -> Player
   winner guestHand bankHand
