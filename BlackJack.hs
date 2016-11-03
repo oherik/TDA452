@@ -21,10 +21,13 @@ module BlackJack where
   empty :: Hand
   empty = Empty
 
+-- Calculate the value of a hand, counting all aces as 11
   numericValue :: Hand -> Integer
   numericValue Empty = 0
   numericValue (Add card hand) = valueCard card + numericValue hand
 
+-- Calculate the value of a hand, setting the value of all aces to 1 if 
+-- the sum would otherwise be >21
   value :: Hand -> Integer
   value Empty = 0
   value hand =  if val > 21
@@ -32,6 +35,7 @@ module BlackJack where
               	else val
                 where val = numericValue hand
 
+-- Ace is here counted as 11, as it is the default value
   valueRank :: Rank -> Integer
   valueRank Jack = 10
   valueRank Queen = 10
