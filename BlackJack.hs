@@ -17,7 +17,7 @@ module BlackJack where
 --    = 2
 
   -- 3.3
-
+  
   empty :: Hand
   empty = Empty
 
@@ -57,10 +57,7 @@ module BlackJack where
 
 -- Specifies if a hand has gone bust
   gameOver :: Hand -> Bool
-  gameOver hand = if val > 21
-                    then True
-                  else False
-                  where val = value hand
+  gameOver hand = value hand > 21
 
 -- Determines which of two hands is the winner of the game
   winner :: Hand -> Hand -> Player
