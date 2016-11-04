@@ -26,8 +26,8 @@ module BlackJack where
   numericValue Empty = 0
   numericValue (Add card hand) = valueCard card + numericValue hand
 
--- Calculate the value of a hand, setting the value of all aces to 1 if 
--- the sum would otherwise be >21
+-- Calculate the value of a hand, setting the value of all aces to 1 if
+-- the sum would otherwise be >21.
   value :: Hand -> Integer
   value Empty = 0
   value hand =  if val > 21
@@ -35,7 +35,8 @@ module BlackJack where
               	else val
                 where val = numericValue hand
 
--- Ace is here counted as 11, as it is the default value
+--  Calculate the value of a rank.Ace is here counted as 11, as it is the
+--  default value
   valueRank :: Rank -> Integer
   valueRank Jack = 10
   valueRank Queen = 10
@@ -43,21 +44,25 @@ module BlackJack where
   valueRank Ace = 11
   valueRank (Numeric int) = int
 
+-- Calculate the value of a card
   valueCard ::  Card -> Integer
   valueCard card = valueRank (rank card)
 
+-- Returns the number of aces in any given hand
   numberOfAces :: Hand -> Integer
   numberOfAces Empty = 0
   numberOfAces (Add card hand) = if(rank card == Ace)
           then 1 + numberOfAces hand
           else 0 + numberOfAces hand
 
+-- Specifies if a hand has gone bust
   gameOver :: Hand -> Bool
   gameOver hand = if val > 21
                     then True
                   else False
                   where val = value hand
 
+-- Determines which of two hands is the winner of the game
   winner :: Hand -> Hand -> Player
   winner guestHand bankHand
                       | gameOverhand == True = Bank
