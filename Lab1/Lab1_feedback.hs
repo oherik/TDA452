@@ -64,7 +64,7 @@ power_tests = prop_powers 2 0 &&
 -- This is due to the fact that our power functions won't accept negative
 -- values for k.
 prop_powers' :: Integer -> Integer -> Bool
-prop_powers' n k = prop_powers' n k = prop_powers n (abs k)
+prop_powers' n k = prop_powers n (abs k)
 
 -- *Main> quickCheck prop_powers'
 -- +++ OK, passed 100 tests.
