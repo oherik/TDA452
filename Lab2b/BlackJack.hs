@@ -80,3 +80,13 @@ module BlackJack where
 
   prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
   prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
+
+  createFullSuit :: Suit -> [Card]
+  createFullSuit suit = [(Card Ace suit)] ++ [(Card (Numeric a) suit) | a <- [2..10]] ++ [(Card b suit) | b <- [Jack, Queen, King]]
+
+  combineCards :: [Card] -> Hand
+  combineCards [card] = Add card Empty
+  combineCards (card:xs) = Add card (combineCards xs)
+
+  fullDeck :: Hand
+  fullDeck = combineCards (createFullSuit Hearts ++ createFullSuit Spades ++ createFullSuit Diamonds ++ createFullSuit Clubs) 
