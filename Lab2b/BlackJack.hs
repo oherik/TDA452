@@ -1,8 +1,9 @@
 module BlackJack where
   import Cards
   import RunGame
+  import System.Random
   import Test.QuickCheck
-  
+
 ---------------------------------------
  -- A
 ---------------------------------------
@@ -81,6 +82,7 @@ module BlackJack where
   prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
   prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
 
+<<<<<<< HEAD
   createFullSuit :: Suit -> [Card]
   createFullSuit suit = [(Card Ace suit)] ++ [(Card (Numeric a) suit) | a <- [2..10]] ++ [(Card b suit) | b <- [Jack, Queen, King]]
 
@@ -90,3 +92,41 @@ module BlackJack where
 
   fullDeck :: Hand
   fullDeck = combineCards (createFullSuit Hearts ++ createFullSuit Spades ++ createFullSuit Diamonds ++ createFullSuit Clubs) 
+=======
+  draw :: Hand -> Hand -> (Hand,Hand)
+  draw Empty _ = error "draw: The deck is empty"
+  draw (Add topDeckCard restOfDeck) hand = (restOfDeck, (Add topDeckCard hand))
+
+  -- Plays the bank, starting with an empty hand
+  playBank :: Hand -> Hand
+  playBank deck = playBank' deck Empty
+
+  -- The bank draws from the deck until its hand value is 16 or above
+  playBank' :: Hand -> Hand -> Hand
+  playBank' deck bankHand | value bankHand < 16 = playBank' deck1' bankHand1'
+                       | otherwise = bankHand
+                       where (deck1',bankHand1') = draw deck bankHand
+
+  --shuffle :: StdGen -> Hand -> Hand
+
+  --Removes the n:th card from a deck
+  removeCard :: Hand -> Integer -> (Card, Hand)
+  removeCard _ n | n<0 = error "removeCard: negative index"
+  removeCard hand n = removeCard' Empty hand n
+
+  -- topPart is reversed in this manner, making it a stack. This means we
+  -- need the addReverse function, instead of the previously created (<+)
+  removeCard' :: Hand -> Hand -> Integer -> (Card, Hand)
+  removeCard' topPart Empty n = error "removeCard: index exceeds hand size"
+  removeCard' topPart (Add c bottomPart) 0 = (c, topPart `addReverse`
+                                            bottomPart)
+  removeCard' topPart (Add c bottomPart) n = removeCard' (Add c topPart)
+                                            bottomPart (n-1)
+
+  -- Adds one hand on top of the other in reverse order
+  addReverse :: Hand -> Hand -> Hand
+  addReverse Empty hand = hand
+  addReverse hand Empty = hand
+  addReverse (Add topLast Empty) bottom = (Add topLast bottom)
+  addReverse (Add topCard top) bottom = addReverse top (Add topCard bottom)
+>>>>>>> 0c1dad3e5b1b73dd1274689a19435ccc444a03d3
