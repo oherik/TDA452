@@ -103,10 +103,14 @@ module BlackJack where
   removeCard _ n | n<0 = error "removeCard: negative index"
   removeCard hand n = removeCard' Empty hand n
 
+  -- topPart is reversed in this manner, making it a stack. This means we
+  -- need the addReverse function, instead of the previously createed (<+)
   removeCard' :: Hand -> Hand -> Integer -> (Card, Hand)
   removeCard' topPart Empty n = error "removeCard: index exceeds hand size"
-  removeCard' topPart (Add c bottomPart) 0 = (c, topPart `addReverse` bottomPart)
-  removeCard' topPart (Add c bottomPart) n = removeCard' (Add c topPart) bottomPart (n-1)
+  removeCard' topPart (Add c bottomPart) 0 = (c, topPart `addReverse`
+                                            bottomPart)
+  removeCard' topPart (Add c bottomPart) n = removeCard' (Add c topPart)
+                                            bottomPart (n-1)
 
   -- Adds one hand on top of the other in reverse order
   addReverse :: Hand -> Hand -> Hand
