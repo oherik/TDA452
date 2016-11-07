@@ -82,7 +82,6 @@ module BlackJack where
   prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
   prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
 
-<<<<<<< HEAD
   createFullSuit :: Suit -> [Card]
   createFullSuit suit = [(Card Ace suit)] ++ [(Card (Numeric a) suit) | a <- [2..10]] ++ [(Card b suit) | b <- [Jack, Queen, King]]
 
@@ -91,8 +90,8 @@ module BlackJack where
   combineCards (card:xs) = Add card (combineCards xs)
 
   fullDeck :: Hand
-  fullDeck = combineCards (createFullSuit Hearts ++ createFullSuit Spades ++ createFullSuit Diamonds ++ createFullSuit Clubs) 
-=======
+  fullDeck = combineCards (createFullSuit Hearts ++ createFullSuit Spades ++ createFullSuit Diamonds ++ createFullSuit Clubs)
+
   draw :: Hand -> Hand -> (Hand,Hand)
   draw Empty _ = error "draw: The deck is empty"
   draw (Add topDeckCard restOfDeck) hand = (restOfDeck, (Add topDeckCard hand))
@@ -129,4 +128,3 @@ module BlackJack where
   addReverse hand Empty = hand
   addReverse (Add topLast Empty) bottom = (Add topLast bottom)
   addReverse (Add topCard top) bottom = addReverse top (Add topCard bottom)
->>>>>>> 0c1dad3e5b1b73dd1274689a19435ccc444a03d3
