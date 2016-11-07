@@ -82,9 +82,11 @@ module BlackJack where
   prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
   prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
 
+  -- Add all cards for the given suit to a list
   createFullSuit :: Suit -> [Card]
   createFullSuit suit = [(Card Ace suit)] ++ [(Card (Numeric a) suit) | a <- [2..10]] ++ [(Card b suit) | b <- [Jack, Queen, King]]
 
+  -- Given a list, return a hand with the cards of the list
   combineCards :: [Card] -> Hand
   combineCards [card] = Add card Empty
   combineCards (card:xs) = Add card (combineCards xs)
@@ -106,7 +108,13 @@ module BlackJack where
                        | otherwise = bankHand
                        where (deck1',bankHand1') = draw deck bankHand
 
-  --shuffle :: StdGen -> Hand -> Hand
+  shuffle :: StdGen -> Hand -> Hand
+  shuffle g Empty = Empty
+  shuffle g frHand = Add card (shuffle g' hand)
+      where
+            frHandSize = size frHand
+            (cardIdx, g') = randomR (1, frHandSize) g
+            (card, hand) = removeCard frHand cardIdx
 
   --Removes the n:th card from a deck
   removeCard :: Hand -> Integer -> (Card, Hand)
