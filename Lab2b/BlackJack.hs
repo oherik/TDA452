@@ -1,6 +1,7 @@
 module BlackJack where
   import Cards
   import RunGame
+  import System.Random
   import Test.QuickCheck
 
 ---------------------------------------
@@ -94,3 +95,22 @@ module BlackJack where
   playBank' deck bankHand | value bankHand < 16 = playBank' deck1' bankHand1'
                        | otherwise = bankHand
                        where (deck1',bankHand1') = draw deck bankHand
+
+  --shuffle :: StdGen -> Hand -> Hand
+
+  --Removes the n:th card from a deck
+  removeCard :: Hand -> Integer -> (Card, Hand)
+  removeCard _ n | n<0 = error "removeCard: negative index"
+  removeCard hand n = removeCard' Empty hand n
+
+  removeCard' :: Hand -> Hand -> Integer -> (Card, Hand)
+  removeCard' topPart Empty n = error "removeCard: index exceeds hand size"
+  removeCard' topPart (Add c bottomPart) 0 = (c, topPart `addReverse` bottomPart)
+  removeCard' topPart (Add c bottomPart) n = removeCard' (Add c topPart) bottomPart (n-1)
+
+  -- Adds one hand on top of the other in reverse order
+  addReverse :: Hand -> Hand -> Hand
+  addReverse Empty hand = hand
+  addReverse hand Empty = hand
+  addReverse (Add topLast Empty) bottom = (Add topLast bottom)
+  addReverse (Add topCard top) bottom = addReverse top (Add topCard bottom)
