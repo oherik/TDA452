@@ -84,3 +84,13 @@ module BlackJack where
   draw :: Hand -> Hand -> (Hand,Hand)
   draw Empty _ = error "draw: The deck is empty"
   draw (Add topDeckCard restOfDeck) hand = (restOfDeck, (Add topDeckCard hand))
+
+  -- Plays the bank, starting with an empty hand
+  playBank :: Hand -> Hand
+  playBank deck = playBank' deck Empty
+
+  -- The bank draws from the deck until its hand value is 16 or above
+  playBank' :: Hand -> Hand -> Hand
+  playBank' deck bankHand | value bankHand < 16 = playBank' deck1' bankHand1'
+                       | otherwise = bankHand
+                       where (deck1',bankHand1') = draw deck bankHand
