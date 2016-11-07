@@ -2,7 +2,7 @@ module BlackJack where
   import Cards
   import RunGame
   import Test.QuickCheck
-  
+
 ---------------------------------------
  -- A
 ---------------------------------------
@@ -80,3 +80,7 @@ module BlackJack where
 
   prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
   prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
+
+  draw :: Hand -> Hand -> (Hand,Hand)
+  draw Empty _ = error "draw: The deck is empty"
+  draw (Add topDeckCard restOfDeck) hand = (restOfDeck, (Add topDeckCard hand))
