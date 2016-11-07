@@ -1,7 +1,8 @@
 module BlackJack where
   import Cards
   import RunGame
-
+  import Test.QuickCheck
+  
 ---------------------------------------
  -- A
 ---------------------------------------
@@ -17,7 +18,7 @@ module BlackJack where
 --    = 2
 
   -- 3.3
-  
+
   empty :: Hand
   empty = Empty
 
@@ -59,6 +60,7 @@ module BlackJack where
   gameOver :: Hand -> Bool
   gameOver hand = value hand > 21
 
+
 -- Determines which of two hands is the winner of the game
   winner :: Hand -> Hand -> Player
   winner guestHand bankHand
@@ -69,3 +71,12 @@ module BlackJack where
                       where gameOverhand = gameOver guestHand
                             val1 = value guestHand
                             val2 = value bankHand
+
+  (<+) :: Hand -> Hand -> Hand
+  (<+) Empty hand = hand
+  (<+) hand Empty = hand
+  (<+) (Add topLast Empty) bottom = (Add topLast bottom)
+  (<+) (Add topCard top) bottom = (Add topCard (top <+ bottom))
+
+  prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
+  prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
