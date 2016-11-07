@@ -104,7 +104,7 @@ module BlackJack where
   removeCard hand n = removeCard' Empty hand n
 
   -- topPart is reversed in this manner, making it a stack. This means we
-  -- need the addReverse function, instead of the previously createed (<+)
+  -- need the addReverse function, instead of the previously created (<+)
   removeCard' :: Hand -> Hand -> Integer -> (Card, Hand)
   removeCard' topPart Empty n = error "removeCard: index exceeds hand size"
   removeCard' topPart (Add c bottomPart) 0 = (c, topPart `addReverse`
