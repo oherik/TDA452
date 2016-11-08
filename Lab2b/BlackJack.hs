@@ -2,7 +2,7 @@ module BlackJack where
   import Cards
   import RunGame
   import System.Random
-  import Test.QuickCheck
+  -- import Test.QuickCheck
 
 ---------------------------------------
  -- A
@@ -108,12 +108,14 @@ module BlackJack where
                        | otherwise = bankHand
                        where (deck1',bankHand1') = draw deck bankHand
 
+  -- Given a random generator and a hand, shuffle the cards
+  -- return the shuffled hand
   shuffle :: StdGen -> Hand -> Hand
   shuffle g Empty = Empty
   shuffle g frHand = Add card (shuffle g' hand)
       where
             frHandSize = size frHand
-            (cardIdx, g') = randomR (1, frHandSize) g
+            (cardIdx, g') = randomR (0, frHandSize-1) g
             (card, hand) = removeCard frHand cardIdx
 
   --Removes the n:th card from a deck
@@ -136,3 +138,17 @@ module BlackJack where
   addReverse hand Empty = hand
   addReverse (Add topLast Empty) bottom = (Add topLast bottom)
   addReverse (Add topCard top) bottom = addReverse top (Add topCard bottom)
+
+  -- Check if a given card is in the hand
+  belongsTo :: Card -> Hand -> Bool
+  c `belongsTo`Empty = False
+  c `belongsTo`(Add c' h) = c == c' || c `belongsTo` h
+
+  -- Check if a card is in a deck before it has been shuffled
+  -- then it should be in the deck afterwards
+  prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
+  prop_shuffle_sameCards g c h = c `belongsTo` h == c `belongsTo` shuffle g h
+
+  -- States that the prize is preserved
+  prop_size_shuffle :: StdGen -> Hand -> Bool
+  prop_size_shuffle g hand = size hand == size (shuffle g hand)
