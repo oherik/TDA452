@@ -2,7 +2,8 @@ module BlackJack where
   import Cards
   import RunGame
   import System.Random
-  -- import Test.QuickCheck
+  import Test.QuickCheck hiding (shuffle) -- To avoid conflict with our
+                                          -- shuffle function
 
 ---------------------------------------
  -- A
