@@ -66,12 +66,12 @@ module BlackJack where
 -- Determines which of two hands is the winner of the game
   winner :: Hand -> Hand -> Player
   winner guestHand bankHand
-                      | gameOverhand == True = Bank
+                      | gameOver guestHand  = Bank
+                      | gameOver bankHand = Guest
                       | val1 == val2 = Bank
                       | val1 > val2 = Guest
                       | otherwise = Bank
-                      where gameOverhand = gameOver guestHand
-                            val1 = value guestHand
+                      where val1 = value guestHand
                             val2 = value bankHand
 
   (<+) :: Hand -> Hand -> Hand
