@@ -112,9 +112,8 @@ module BlackJack where
   -- The bank draws from the deck until its hand value is 16 or above
   playBank' :: Hand -> Hand -> Hand
   playBank' deck bankHand | value bankHand < 16 =
-                                    playBank' deck1' bankHand1'
+                                    uncurry playBank' (draw deck bankHand)
                        | otherwise = bankHand
-                       where (deck1',bankHand1') = draw deck bankHand
 
   -- Given a random generator and a hand, shuffle the cards
   -- return the shuffled hand
