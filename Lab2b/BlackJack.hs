@@ -68,7 +68,6 @@ module BlackJack where
   winner guestHand bankHand
                       | gameOver guestHand  = Bank
                       | gameOver bankHand = Guest
-                      | val1 == val2 = Bank
                       | val1 > val2 = Guest
                       | otherwise = Bank
                       where val1 = value guestHand
