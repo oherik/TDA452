@@ -17,7 +17,7 @@ module BlackJack where
 --    = 2
 
   -- 3.3
-  
+
   empty :: Hand
   empty = Empty
 
@@ -60,12 +60,11 @@ module BlackJack where
   gameOver hand = value hand > 21
 
 -- Determines which of two hands is the winner of the game
-  winner :: Hand -> Hand -> Player
-  winner guestHand bankHand
-                      | gameOverhand == True = Bank
-                      | val1 == val2 = Bank
-                      | val1 > val2 = Guest
-                      | otherwise = Bank
-                      where gameOverhand = gameOver guestHand
-                            val1 = value guestHand
-                            val2 = value bankHand
+winner :: Hand -> Hand -> Player
+winner guestHand bankHand
+                    | gameOver guestHand  = Bank
+                    | gameOver bankHand = Guest
+                    | val1 > val2 = Guest
+                    | otherwise = Bank
+                    where val1 = value guestHand
+                          val2 = value bankHand
