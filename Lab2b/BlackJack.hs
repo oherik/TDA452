@@ -84,22 +84,14 @@ module BlackJack where
   prop_onTopOf_assoc p1 p2 p3 = p1<+(p2<+p3) == (p1<+p2)<+p3
 
   -- Add all cards for the given suit to a list
-  createFullSuit :: Suit -> [Card]
-  createFullSuit suit = [(Card Ace suit)] ++
-                        [(Card (Numeric a) suit) | a <- [2..10]] ++
-                        [(Card b suit) | b <- [Jack, Queen, King]]
-
-  -- Given a list, return a hand with the cards of the list
-  combineCards :: [Card] -> Hand
-  combineCards [card] = Add card Empty
-  combineCards (card:xs) = Add card (combineCards xs)
+  createFullSuit :: Suit -> Hand
+  createFullSuit suit = foldr Add Empty
+                        ([(Card (Numeric a) suit) | a <- [2..10]] ++
+                        [(Card b suit) | b <- [Jack, Queen, King,Ace]])
 
   -- Returns a full deck of cards
   fullDeck :: Hand
-  fullDeck = combineCards (createFullSuit Hearts ++
-                          createFullSuit Spades ++
-                          createFullSuit Diamonds ++
-                          createFullSuit Clubs)
+  fullDeck = foldr (<+) Empty (map createFullSuit [Hearts, Spades, Diamonds, Clubs])
 
   -- Given a deck and a hand, draw a card from the deck and puts it on the hand
   draw :: Hand -> Hand -> (Hand,Hand)
