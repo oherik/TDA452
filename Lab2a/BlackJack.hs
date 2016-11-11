@@ -12,8 +12,8 @@ module BlackJack where
 --    = size (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
 --    = 1 + size (Add (Card Jack Spades) Empty)
 --    = 1 + 1 + size Empty
---    = 2 + size Empty
---    = 2 + 0
+--    = 1 + 1 + 0
+--    = 1 + 1
 --    = 2
 
   -- 3.3
