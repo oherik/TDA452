@@ -11,13 +11,13 @@ module BlackJack where
 
  -- 3.2
 
--- size hand2
---    = size (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
---    = 1 + size (Add (Card Jack Spades) Empty)
---    = 1 + 1 + size Empty
---    = 2 + size Empty
---    = 2 + 0
---    = 2
+ -- size hand2
+ --    = size (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
+ --    = 1 + size (Add (Card Jack Spades) Empty)
+ --    = 1 + 1 + size Empty
+ --    = 1 + 1 + 0
+ --    = 1 + 1
+ --    = 2
 
   -- 3.3
 
