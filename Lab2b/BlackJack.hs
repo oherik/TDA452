@@ -73,6 +73,7 @@ module BlackJack where
                       where val1 = value guestHand
                             val2 = value bankHand
 
+  -- Given two hands, puts the first one on top of the second one
   (<+) :: Hand -> Hand -> Hand
   (<+) Empty hand = hand
   (<+) hand Empty = hand
@@ -93,12 +94,14 @@ module BlackJack where
   combineCards [card] = Add card Empty
   combineCards (card:xs) = Add card (combineCards xs)
 
+  -- Returns a full deck of cards
   fullDeck :: Hand
   fullDeck = combineCards (createFullSuit Hearts ++
                           createFullSuit Spades ++
                           createFullSuit Diamonds ++
                           createFullSuit Clubs)
 
+  -- Given a deck and a hand, draw a card from the deck and puts it on the hand
   draw :: Hand -> Hand -> (Hand,Hand)
   draw Empty _ = error "draw: The deck is empty"
   draw (Add topDeckCard restOfDeck) hand =
@@ -118,10 +121,11 @@ module BlackJack where
   -- return the shuffled hand
   shuffle :: StdGen -> Hand -> Hand
   shuffle g Empty = Empty
-  shuffle g fromHand = Add card (shuffle g' hand)
+  shuffle g frHand = Add card (shuffle g' hand)
       where
-            (cardIndex, g') = randomR (0, size fromHand - 1) g
-            (card, hand) = removeCard fromHand cardIndex
+            frHandSize = size frHand
+            (cardIdx, g') = randomR (0, frHandSize-1) g
+            (card, hand) = removeCard frHand cardIdx
 
   --Removes the n:th card from a deck
   removeCard :: Hand -> Integer -> (Card, Hand)
