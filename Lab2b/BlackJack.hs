@@ -91,7 +91,8 @@ module BlackJack where
 
   -- Returns a full deck of cards
   fullDeck :: Hand
-  fullDeck = foldr (<+) Empty (map createFullSuit [Hearts, Spades, Diamonds, Clubs])
+  fullDeck = foldr (<+) Empty (map createFullSuit
+                                  [Hearts, Spades, Diamonds, Clubs])
 
   -- Given a deck and a hand, draw a card from the deck and puts it on the hand
   draw :: Hand -> Hand -> (Hand,Hand)
@@ -113,11 +114,10 @@ module BlackJack where
   -- return the shuffled hand
   shuffle :: StdGen -> Hand -> Hand
   shuffle g Empty = Empty
-  shuffle g frHand = Add card (shuffle g' hand)
+  shuffle g fromHand = Add card (shuffle g' hand)
       where
-            frHandSize = size frHand
-            (cardIdx, g') = randomR (0, frHandSize-1) g
-            (card, hand) = removeCard frHand cardIdx
+            (cardIndex, g') = randomR (0, size fromHand -1) g
+            (card, hand) = removeCard fromHand cardIndex
 
   --Removes the n:th card from a deck
   removeCard :: Hand -> Integer -> (Card, Hand)
