@@ -9,16 +9,7 @@ data Sudoku = Sudoku { rows :: [[Maybe Int]] }
 
 -- allBlankSudoku is a sudoku with just blanks
 allBlankSudoku :: Sudoku
-allBlankSudoku = Sudoku(blankMatrix 9 9)
-
-blankMatrix :: Integer -> Integer -> [[Maybe Int]]
-blankMatrix 1 m = [blankList m]
-blankMatrix n m = [blankList m] ++ (blankMatrix (n-1) m)
-
-blankList :: Integer -> [Maybe Int]
-blankList 1 = [Nothing]
-blankList n | n < 1 = error "Negative size"
-blankList n = [Nothing] ++ (blankList (n-1))
+allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
 
 -- isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
