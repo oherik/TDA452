@@ -16,16 +16,9 @@ allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
 -- the matrix are valid (see validMaybes)
 isSudoku :: Sudoku -> Bool
 isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
-                      [validMaybes i | i <- rows'])
+                      [0<j && j<10 | (Just j) <- concat rows'])
   where
       rows' = rows sudoku
-
--- Checks if a list of Maybe Ints containts either Nothing or Ints between
--- 1 and 9. Theses are the valid values for sudoku cells.
-validMaybes :: [Maybe Int] -> Bool
-validMaybes [] = True
-validMaybes (Nothing:xs) = True && validMaybes xs
-validMaybes ((Just x):xs) = x > 0 && x < 10 && validMaybes xs
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
