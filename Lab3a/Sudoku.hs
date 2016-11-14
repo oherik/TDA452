@@ -12,14 +12,16 @@ data Sudoku = Sudoku { rows :: [[Maybe Int]] }
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
 
--- isSudoku sud checks if sud is really a valid representation of a sudoku
--- puzzle
+-- Checks that a sudoku consists of a 9x9 matrix, and that all values in
+-- the matrix are valid (see validMaybes)
 isSudoku :: Sudoku -> Bool
 isSudoku sudoku = and ([length rows' == 9, all (==9) (map length rows')] ++
                       [validMaybes i | i <- rows'])
   where
       rows' = rows sudoku
 
+-- Checks if a list of Maybe Ints containts either Nothing or Ints between
+-- 1 and 9. Theses are the valid values for sudoku cells.
 validMaybes :: [Maybe Int] -> Bool
 validMaybes [] = True
 validMaybes (Nothing:xs) = True && validMaybes xs
