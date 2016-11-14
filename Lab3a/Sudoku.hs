@@ -13,7 +13,7 @@ allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
 
 -- Checks that a sudoku consists of a 9x9 matrix, and that all values in
--- the matrix are valid (see validMaybes)
+-- the matrix are valid
 isSudoku :: Sudoku -> Bool
 isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
                       [0<j && j<10 | (Just j) <- concat rows'])
