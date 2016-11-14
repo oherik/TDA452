@@ -15,11 +15,15 @@ allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
 -- isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku sudoku = and [length rows' == 9, all (==9) (map length rows'),
-                      all (>0) ints, all (<10) ints]
+isSudoku sudoku = and ([length rows' == 9, all (==9) (map length rows')] ++
+                      [validMaybes i | i <- rows'])
   where
       rows' = rows sudoku
-      ints = catMaybes (concat rows')
+
+validMaybes :: [Maybe Int] -> Bool
+validMaybes [] = True
+validMaybes (Nothing:xs) = True && validMaybes xs
+validMaybes ((Just x):xs) = x > 0 && x < 10 && validMaybes xs
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
