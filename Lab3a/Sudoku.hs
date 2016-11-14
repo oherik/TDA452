@@ -29,7 +29,9 @@ validMaybes ((Just x):xs) = x > 0 && x < 10 && validMaybes xs
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
-isSolved = undefined
+isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) rows'
+  where
+      rows' = rows sudoku
 
 -- example sudoku (TODO: remove!)
 example :: Sudoku
