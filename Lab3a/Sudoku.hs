@@ -21,9 +21,6 @@ isSudoku sudoku = and [length rows' == 9, all (==9) (map length rows'),
       rows' = rows sudoku
       ints = catMaybes (concat rows')
 
-f :: Int -> Bool
-f x = x == 9
-
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
 isSolved = undefined
