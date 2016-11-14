@@ -1,6 +1,7 @@
 module Sudoku where
 
 import Test.QuickCheck
+import Data.Maybe
 
 -------------------------------------------------------------------------
 
@@ -14,17 +15,14 @@ allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
 -- isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku sudoku = (and ([(length rows' == 9), (length columns == 9)] ++
-                        [validMaybeArray i | i <- rows']))
+isSudoku sudoku = and [length rows' == 9, all (==9) (map length rows'),
+                      all (>0) ints, all (<10) ints]
   where
       rows' = rows sudoku
-      columns = head rows'
+      ints = catMaybes (concat rows')
 
--- Check if an array contains valid values (blank or a number between 1 and 9)
-validMaybeArray :: [Maybe Int] -> Bool
-validMaybeArray [] = True
-validMaybeArray (Nothing:xs) = True && validMaybeArray xs
-validMaybeArray ((Just x):xs)  = x>0 && x<10 && validMaybeArray xs
+f :: Int -> Bool
+f x = x == 9
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
