@@ -23,11 +23,8 @@ isSudoku sudoku = (and ([(length rows' == 9), (length columns == 9)] ++
 -- Check if an array contains valid values (blank or a number between 1 and 9)
 validMaybeArray :: [Maybe Int] -> Bool
 validMaybeArray [] = True
-validMaybeArray (x:xs) = validMaybe x && validMaybeArray xs
-
-validMaybe :: Maybe Int -> Bool
-validMaybe Nothing = True
-validMaybe (Just x) = x>0 && x<10
+validMaybeArray (Nothing:xs) = True && validMaybeArray xs
+validMaybeArray ((Just x):xs)  = x>0 && x<10 && validMaybeArray xs
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
