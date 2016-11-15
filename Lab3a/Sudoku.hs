@@ -22,9 +22,7 @@ isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
-isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) rows'
-  where
-      rows' = rows sudoku
+isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) (rows sudoku) 
 
 -- example sudoku (TODO: remove!)
 example :: Sudoku
