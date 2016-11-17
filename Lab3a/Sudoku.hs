@@ -59,7 +59,7 @@ printSudoku sudoku = do
 
 maybeToChar :: Maybe Int -> Char
 maybeToChar Nothing = '.'
-maybeToChar (Just j) = chr $ j + (ord '0')
+maybeToChar (Just j) = chr $ j + ord '0'
 
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
