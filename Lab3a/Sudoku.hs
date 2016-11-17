@@ -66,7 +66,7 @@ maybeToChar (Just j) = chr $ j + (ord '0')
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do
                 s <- readFile path
-                let sudoku = Sudoku ([map charToMaybe line | line <- lines s])
+                let sudoku = Sudoku [map charToMaybe line | line <- lines s]
                 if isSudoku sudoku
                   then return sudoku
                 else error "Not a valid sudoku"
