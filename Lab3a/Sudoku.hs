@@ -22,8 +22,9 @@ isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
       rows' = rows sudoku
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
-isSolved :: Sudoku -> Bool
+isSolved :: Sudoku -> Bool --TODO: should isSudoku be here or not?
 isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) (rows sudoku)
+
 
 -- example sudoku (TODO: remove!)
 example :: Sudoku
@@ -58,14 +59,17 @@ maybeToChar (Just j) = chr $ j + (ord '0')
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
 readSudoku :: FilePath -> IO Sudoku
-readSudoku = undefined
+readSudoku path = do
+                s <- readFile path
+                let sudoku = Sudoku ([map charToMaybe line | line <- lines s])
+                if isSudoku sudoku
+                  then return sudoku
+                else error "Not a valid sudoku"
 
 charToMaybe :: Char -> Maybe Int
 charToMaybe '.' = Nothing
-charToMaybe x | valx > 9 || valx < 1 = error "Not a valid sudoko char"
-              | otherwise = Just valx
-              where
-                valx = ord x - ord '0'
+charToMaybe x  = Just $ ord x - ord '0'
+
 -------------------------------------------------------------------------
 
 -- cell generates an arbitrary cell in a Sudoku
