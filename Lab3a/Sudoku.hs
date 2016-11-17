@@ -107,11 +107,11 @@ type Block = [Maybe Int]
 -- Checks if the given block does not contain the same digit twice
 isOkayBlock :: Block -> Bool
 isOkayBlock [] = True
-isOkayBlock [_] = True
+isOkayBlock (Nothing:xs) = isOkayBlock xs
 isOkayBlock (x:xs) = if elem x xs then False
                                   else isOkayBlock xs
 
---
+
 --
 --
 -- blocks :: Sudoku -> [Block]
