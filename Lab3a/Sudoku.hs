@@ -52,6 +52,11 @@ printSudoku :: Sudoku -> IO ()
 printSudoku sudoku = do
    sequence_ $ map putStrLn [map maybeToChar row | row <- rows sudoku]
 
+--TODO or use the lambda function
+-- (\ c -> if isNothing c then '.' else chr $ (fromJust c) + (ord '0'))
+-- instad of maybeToChar. Might look fancier, but debugging using QuickCheck
+-- will be more difficult
+
 maybeToChar :: Maybe Int -> Char
 maybeToChar Nothing = '.'
 maybeToChar (Just j) = chr $ j + (ord '0')
@@ -65,6 +70,8 @@ readSudoku path = do
                 if isSudoku sudoku
                   then return sudoku
                 else error "Not a valid sudoku"
+
+--TODO could use a lambda function here aswell
 
 charToMaybe :: Char -> Maybe Int
 charToMaybe '.' = Nothing
