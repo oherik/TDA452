@@ -95,4 +95,25 @@ instance Arbitrary Sudoku where
     do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
        return (Sudoku rows)
 
+-- Checks if the generated sudoku is a real sudoku
+
+prop_Sudoku :: Sudoku -> Bool
+prop_Sudoku sudoku = isSudoku sudoku
+
 -------------------------------------------------------------------------
+
+type Block = [Maybe Int]
+
+-- Checks if the given block does not contain the same digit twice
+isOkayBlock :: Block -> Bool
+isOkayBlock [] = True
+isOkayBlock [_] = True
+isOkayBlock (x:xs) = if elem x xs then False
+                                  else isOkayBlock xs
+
+--
+--
+--
+-- blocks :: Sudoku -> [Block]
+--
+-- isOkay :: Sudoku -> Bool
