@@ -2,6 +2,7 @@ module Sudoku where
 
 import Test.QuickCheck
 import Data.Maybe
+import Data.Char
 
 -------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
-isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) (rows sudoku) 
+isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) (rows sudoku)
 
 -- example sudoku (TODO: remove!)
 example :: Sudoku
@@ -47,7 +48,12 @@ example =
 
 -- printSudoku sud prints a representation of the sudoku sud on the screen
 printSudoku :: Sudoku -> IO ()
-printSudoku = undefined
+printSudoku sudoku = do
+   putStrLn (unlines [map maybeToChar row | row <- (rows sudoku)])
+
+maybeToChar :: (Maybe Int) -> Char
+maybeToChar Nothing = '.'
+maybeToChar (Just j) = chr (j+ (ord '0'))
 
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
