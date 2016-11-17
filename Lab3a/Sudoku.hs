@@ -60,6 +60,12 @@ maybeToChar (Just j) = chr (j+ (ord '0'))
 readSudoku :: FilePath -> IO Sudoku
 readSudoku = undefined
 
+charToMaybe :: Char -> Maybe Int
+charToMaybe '.' = Nothing
+charToMaybe x | ((ord x - ord '0') > 9) || ((ord x - ord '0') < 1 ) = error "Not a valid char"
+charToMaybe x | otherwise = Just (ord x - ord '0')
+ -- TODO: add a where-clause instead of (ord x - ord '0'), this was a hotfix
+  -- (but I can't fix it right now since the plane is departing)
 -------------------------------------------------------------------------
 
 -- cell generates an arbitrary cell in a Sudoku
