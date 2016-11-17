@@ -49,11 +49,11 @@ example =
 -- printSudoku sud prints a representation of the sudoku sud on the screen
 printSudoku :: Sudoku -> IO ()
 printSudoku sudoku = do
-   sequence_ (map putStrLn [map maybeToChar row | row <- (rows sudoku)])
+   sequence_ $ map putStrLn [map maybeToChar row | row <- rows sudoku]
 
-maybeToChar :: (Maybe Int) -> Char
+maybeToChar :: Maybe Int -> Char
 maybeToChar Nothing = '.'
-maybeToChar (Just j) = chr (j+ (ord '0'))
+maybeToChar (Just j) = chr $ j + (ord '0')
 
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
