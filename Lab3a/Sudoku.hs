@@ -79,6 +79,8 @@ charToMaybe x  = Just $ ord x - ord '0'
 
 -------------------------------------------------------------------------
 
+
+
 -- cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
 cell = frequency [(1, rJust),(9,  return Nothing)]
@@ -93,7 +95,6 @@ instance Arbitrary Sudoku where
        return (Sudoku rows)
 
 -- Checks if the generated sudoku is a real sudoku
-
 prop_Sudoku :: Sudoku -> Bool
 prop_Sudoku sudoku = isSudoku sudoku
 
@@ -108,9 +109,28 @@ isOkayBlock (Nothing:xs) = isOkayBlock xs
 isOkayBlock (x:xs) = if elem x xs then False
                                   else isOkayBlock xs
 
+-- Given a Sudoku, creates a list of all blocks of that Sudoku
+blocks :: Sudoku -> [Block]
+blocks sudoku = rows' ++ columns' ++ blocks'
+  where rows' = (rows sudoku)
+        columns' = [getAllColBlock i sudoku | i <- [0..8]]
+        blocks' = [get3x3Block x y sudoku | x <- [0, 3, 6], y <- [0,3,6]]
 
---
---
--- blocks :: Sudoku -> [Block]
---
--- isOkay :: Sudoku -> Bool
+
+getAllColBlock :: Int -> Sudoku -> Block
+getAllColBlock i (Sudoku rows) = [ row!!i | row <- rows]
+
+get3x3Block :: Int -> Int -> Sudoku -> Block
+get3x3Block x y (Sudoku rows) = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
+
+
+-- Property that states that for each Sudoku,
+--there are 3*9 blocks and each block has exactly 9 cells
+prop_SudokuBlocks :: Sudoku -> Bool
+prop_SudokuBlocks sudoku = length blocks' == 27 && and [length b == 9 | b <- blocks']
+  where blocks' = blocks sudoku
+
+-- Given a Sudoku, checks that everything does not
+-- contain the same digit twice
+isOkay :: Sudoku -> Bool
+isOkay sudoku = all isOkayBlock (blocks sudoku)
