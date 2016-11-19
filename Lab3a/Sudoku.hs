@@ -23,7 +23,7 @@ isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool --TODO: should isSudoku be here or not?
-isSolved sudoku = isSudoku sudoku && all (all (not . isNothing)) (rows sudoku)
+isSolved sudoku = all (all (not . isNothing)) (rows sudoku)
 
 
 -- example sudoku (TODO: remove!)
@@ -85,6 +85,7 @@ charToMaybe x  = Just $ ord x - ord '0'
 cell :: Gen (Maybe Int)
 cell = frequency [(1, rJust),(9,  return Nothing)]
 
+-- return a random Just Int between 1 and 9
 rJust :: Gen (Maybe Int)
 rJust = elements [Just j | j <- [1..9]]
 
@@ -117,17 +118,19 @@ blocks sudoku = rows' ++ columns' ++ blocks'
         blocks' = [get3x3Block x y sudoku | x <- [0, 3, 6], y <- [0,3,6]]
 
 
-getAllColBlock :: Int -> Sudoku -> Block
+getAllColBlock :: Int -> Sudoku -> Block -- TODO egen funktion?
 getAllColBlock i (Sudoku rows) = [ row!!i | row <- rows]
 
 get3x3Block :: Int -> Int -> Sudoku -> Block
-get3x3Block x y (Sudoku rows) = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
+get3x3Block x y (Sudoku rows) = concat [ take 3 (drop x row)
+                  | row <- take 3 (drop y rows)]
 
 
 -- Property that states that for each Sudoku,
 --there are 3*9 blocks and each block has exactly 9 cells
 prop_SudokuBlocks :: Sudoku -> Bool
-prop_SudokuBlocks sudoku = length blocks' == 27 && and [length b == 9 | b <- blocks']
+prop_SudokuBlocks sudoku = length blocks' == 27 &&
+                        and [length b == 9 | b <- blocks']
   where blocks' = blocks sudoku
 
 -- Given a Sudoku, checks that everything does not
