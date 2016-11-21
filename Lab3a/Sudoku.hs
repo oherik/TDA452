@@ -83,11 +83,8 @@ charToMaybe x  = Just $ ord x - ord '0'
 
 -- cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
-cell = frequency [(1, rJust),(9,  return Nothing)]
-
--- return a random Just Int between 1 and 9
-rJust :: Gen (Maybe Int)
-rJust = elements [Just j | j <- [1..9]]
+cell = frequency [(1, rJust),(9, return Nothing)]
+  where rJust = elements [Just j | j <- [1..9]]
 
 -- an instance for generating Arbitrary Sudokus
 instance Arbitrary Sudoku where
