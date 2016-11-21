@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<!-- saved from url=(0080)http://www.cse.chalmers.se/edu/course/TDA452_Functional_Programming/exercises/3/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="prev" href="http://www.cse.chalmers.se/edu/course/TDA452_Functional_Programming/exercises/2/" title="Week 2">
+<link rel="next" href="http://www.cse.chalmers.se/edu/course/TDA452_Functional_Programming/exercises/4/" title="Week 4">
+<link rel="stylesheet" href="./Functional Programming 2016 Exercises for Week 3_files/exercises.css" title="FP">
+<meta name="viewport" content="width = device-width">
+
+
+
+
+
+
+<title>Functional Programming 2016 Exercises for Week 3</title>
+</head><body><header>
+<div class="codes">
+  TDA 452
+  <br>DIT 142
+  <br>HT&nbsp;2016
+</div>
+<h1>
+<a href="http://www.haskell.org/"><img title="Haskell Logo" src="./Functional Programming 2016 Exercises for Week 3_files/Haskell-Logo.svg" alt=""></a>
+Functional Programming 2016
+<br><small>Exercises for Week 3</small></h1>
+</header>
+
+
+<nav>
+<ul>
+  <li><a href="http://www.cse.chalmers.se/edu/course/TDA452_Functional_Programming/">Home</a> </li><li> &gt;
+  </li><li><a href="http://www.cse.chalmers.se/edu/course/TDA452_Functional_Programming/#lectures">Exercises</a> </li><li> &gt;
+  </li><li>Week 3
+</li></ul>
+</nav>
+
+<main>
+
+<h2>Exercises for Week 3: Lists and List Comprehensions</h2>
+
+<p>Here are some exercises designed to help you practice programming with lists
+and list comprehensions.
+</p><p>
+You may need the following useful standard functions:
+</p><blockquote>
+<dl>
+  <dt><code>or :: [Bool] -&gt; Bool</code>
+  </dt><dd>returns <code>True</code> if any element of its argument list is <code>True</code>.
+  </dd><dt><code>and :: [Bool] -&gt; Bool</code>
+  </dt><dd>returns <code>True</code> if every element of its argument list is <code>True</code>.
+  </dd><dt><code>nub :: Eq a =&gt; [a] -&gt; [a]</code>
+  </dt><dd>which removes duplicate elements from a list.
+</dd></dl>
+</blockquote>
+
+The function <code>nub</code> is defined in the standard library module
+<code>Data.List</code>:
+you must write <pre>import Data.List</pre> at the beginning of
+any Haskell program that uses it.
+
+<p>
+If you do not have time to do all these exercises, don't worry.
+The exercises are intended to provide enough work to keep the <i>most</i> 
+experienced students busy. If you do all exercises marked with an (*) you have
+probably understood this week's material.
+</p><p>
+Good luck!
+</p><p>
+
+</p><h3>0 (*). Defining Functions over Lists</h3>
+(Based on Thompson's book, Chapter 7)
+
+<p><b>A.</b> The prelude defines a function <code>take</code> which is
+used to take a given number of elements from a list.  For example,
+
+</p><pre>take 5 "Programming in Haskell is fun!" = "Progr"
+</pre>
+
+A possible implementation of <code>take</code> is
+
+<pre>take :: Int -&gt; [a] -&gt; [a]
+take 0 _              = []
+take _ []             = []
+take n (x:xs) | n &gt; 0 = x : take (n-1) xs
+take _ _              = error "PreludeList.take: negative argument"
+</pre>
+
+Use this definition of <code>take</code> as a guide to
+implement the prelude functions <code>drop</code> and <code>splitAt</code>.
+
+<p><b>B.</b> How would you define a function <code>zip3</code> which zips
+together three lists?  Try to write a recursive definition and also
+one which uses <code>zip</code> instead; what are the advantages and
+disadvantages of the two definitions?
+
+</p><h3>1. Permutations</h3>
+
+<p>A <dfn>permutation</dfn> of a list is another list with the same elements,
+but in a possibly different order. For example, [1,2,1] is a permutation
+of [2,1,1], but not of [1,2,2].
+
+Write a function
+</p><pre>isPermutation :: Eq a =&gt; [a] -&gt; [a] -&gt; Bool</pre>
+that returns <code>True</code> if its arguments are permutations of each other.
+
+<p>Express suitable properties of the <code>reverse</code>
+function in the context of permutations.</p>
+
+<h3>2. Avoiding Duplicates</h3>
+
+(repeated from last week)
+
+<p>
+In many situations, lists should not contain <em>duplicate</em> elements. For 
+example, a pack of cards should not contain the same card twice. Define a 
+function
+
+</p><pre>duplicates :: Eq a =&gt; [a] -&gt; Bool</pre>
+which returns <code>True</code> if its argument contains duplicate elements.
+
+<pre class="interactive Main"><code>duplicates [1,2,3,4,5]</code>
+False
+<code>duplicates [1,2,3,2]</code>
+True
+</pre>
+<p><em>Hint:</em> the standard function <code>elem</code>, which tests whether
+an element occurs in a list, is helpful here.
+
+</p><p>One way to <i>ensure</i> a list contains no duplicates is to start with a 
+list that might contain duplicate elements, and remove them.
+Define a function
+
+</p><pre>removeDuplicates :: Eq a =&gt; [a] -&gt; [a]</pre>
+
+which returns a list containing the same elements as its argument, but 
+without duplicates. Test it using the following property:
+<pre>prop_duplicatesRemoved :: [Integer] -&gt; Bool
+prop_duplicatesRemoved xs = not (duplicates (removeDuplicates xs))
+</pre>
+
+<p>Does this property guarantee that removeDuplicates behaves correctly?
+If not, what is missing?
+
+</p><p>(<code>removeDuplicates</code> is actually a standard function,
+called <code>nub</code>).
+
+</p><h3>3. Pascal's Triangle</h3>
+
+Pascal's triangle is a triangle of numbers
+
+<pre>      1
+     1 1
+    1 2 1
+  1  3 3  1
+ 1 4  6  4 1
+1 5 10 10 5 1
+.............
+</pre>
+
+computed as follows:
+
+<ul>
+  <li>The first row just contains a 1.
+  </li><li>The following rows are computed by adding together adjacent numbers in
+      the row above, and adding a 1 at the beginning and at the end.
+</li></ul>
+
+Pascal's triangle is related to the binomial theorem.
+
+<p>Define a function
+
+</p><pre>pascal :: Int -&gt; [Int]</pre>
+
+so that <code>pascal</code> <var>n</var> computes the <var>n</var>th
+row of Pascal's triangle.
+
+<h3>4. Erastosthenes' sieve</h3>
+
+Eratosthenes' sieve is an ancient method for finding prime numbers. Start by
+writing out all the numbers from 2 to (say) 100. The first number (2) is
+prime. Now cross out all multiples of 2. The first remaining number (3) is
+also prime. Cross out all multiples of 3. The first remaining number (5) is
+also prime... and so on. When no numbers remain, you have found all the prime
+numbers in the range you started with.
+
+<p>Define a function
+
+</p><pre>crossOut :: Int -&gt; [Int] -&gt; [Int]</pre>
+
+so that <code>crossOut</code> <var>m</var> <var>ns</var>
+removes all multiples of <var>m</var> from <var>ns</var>. Try to not
+implement <code>crossOut</code> recursively,
+but use a list comprehension instead!
+
+<p>Now define a (recursive!) function
+
+</p><pre>sieve :: [Int] -&gt; [Int]</pre>
+
+which applies Eratosthenes' sieve to the list of numbers it is given, and
+returns a list of all the prime numbers that it found. This is a recursive
+function with a <em>list</em> as its argument, so you must see to it that the
+list gets smaller in each recursive call. Take an empty argument list as your
+base case.
+
+<p>Use sieve to construct the list of primes from 2 to 100.
+
+</p><h3>5. Number Games</h3>
+
+In these examples we'll investigate the properties of prime numbers in the
+range 2 to 100.  Define functions
+
+<ul>
+  <li>To test whether <var>n</var> is a prime (in the range 2 to 100).
+  </li><li>To test whether <var>n</var> is a sum of two primes (in the range 2 to 100).
+</li></ul>
+
+It is hypothesized that every even number greater than two can be expressed as
+the sum of two primes. For example, 4 = 2+2, 6 = 3+3, 8 = 3+5. Is this true
+for all even numbers in the range 4 to 100?
+
+<h3>6 (*). Occurrences in Lists</h3>
+
+Define the following functions, and state their (polymorphic) types:
+
+<ul>
+  <li><code>occursIn x xs</code>,
+  which returns <code>True</code> if <code>x</code> is an element
+  of <code>xs</code>.
+  </li><li><code>allOccurIn xs ys</code>,
+  which returns <code>True</code> if all of the elements of <code>xs</code>
+  are also elements of <code>ys</code>.
+  </li><li><code>sameElements xs ys</code>,
+  which returns <code>True</code> if <code>xs</code> and <code>ys</code>
+  have exactly the same elements.
+  </li><li><code>numOccurrences x xs</code>,
+  which returns the number of times <code>x</code> occurs in <code>xs</code>.
+</li></ul>
+
+In the implementations of the above functions, try to not use recursion, but
+use a list comprehension instead!
+<p>
+In some ways, lists are like sets: both are collections of elements. But the
+order of elements in a list matters, while it does not matter in a set, and
+the number of occurrences in a list matters, while it does not matter in a
+set.
+</p><p>
+The concept of a <dfn>bag</dfn> is something between a list and a set: the
+number of occurrences matters, but the order of elements does not. One way to
+represent a bag is a list of pairs of values and the number of times the value
+occurs: for example
+
+</p><pre>[("a",1), ("b",2)]</pre>
+
+Define a function <code>bag</code> to convert a list into a bag. For example,
+
+<pre>bag "hello"</pre>
+
+should be
+<pre>[('h',1),('e',1),('l',2),('o',1)]</pre>
+
+<h3>7 Elements and Positions</h3>
+
+Elements which occur in lists do so at a particular position. For example, 'l'
+occurs in "hello" at positions 3 and 4. Define functions
+<ul>
+  <li><code>positions xs</code>,
+  which converts a list into a list of pairs of elements and
+  their positions. Hint: Make use of the standard function <code>zip</code>.
+  </li><li><code>firstPosition x xs</code>,
+  which returns the first position at which x occurs in xs.
+  </li><li><code>remove1 x xs</code>,
+  which removes the first occurrence of x from xs. For
+  example, <code>remove1 'l' "hello" == "helo"</code>
+  </li><li><code>remove n x xs</code>,
+  which removes the first n occurrences of x from xs.
+</li></ul>
+
+<h3>8 (*). More List Comprehensions</h3>
+
+Experiment with the function
+
+<pre>pairs :: [a] -&gt; [b] -&gt; [(a,b)]
+pairs xs ys = [(x,y) | x&lt;-xs, y&lt;-ys]
+</pre>
+
+and see what it does.
+
+<p>
+A <dfn>Pythagorean triad</dfn> is a triple of integers
+(<var>a</var>,<var>b</var>,<var>c</var>) such that
+
+<var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup>.
+
+Find all Pythagorean triads with <var>a</var>≤<var>b</var>≤<var>c</var>≤100.
+</p></main>
+</body></html>

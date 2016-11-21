@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<!-- saved from url=(0107)http://www.cse.chalmers.se/edu/course/TDA452_Functional_Programming/lectures/OverloadingAndTypeClasses.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width = device-width">
+<title>Overloading and type classes in Haskell
+</title>
+<link rel="stylesheet" type="text/css" href="./Overloading and type classes in Haskell_files/tslides.css" title="Slides"></head>
+
+<body class="all">
+Page 1
+<div class="page"><h1>Overloading and type classes in Haskell
+</h1><h2>How to make ad-hoc polymorphism less ad hoc
+</h2><h3><p class="center"><img src="./Overloading and type classes in Haskell_files/151777694_37a4164b59.jpg"></p></h3></div>
+Page 2
+<div class="page"><h1>Overloading
+</h1>
+<ul>
+<li>Many programming languages have some form of overloading.
+
+</li><li>Often limited to built-in operators:
+
+<ul>
+<li>Equality tests for all basic types.
+
+</li><li>Numeric operators for integers and floating point numbers.
+</li></ul>
+</li><li>In some languages you can define your own overloaded functions:
+
+<ul>
+<li>Just define two or more functions with the same name, but different types.
+</li></ul>
+</li><li>Haskell takes this a step further...
+</li></ul></div>
+Page 3
+<div class="page"><h1>Overloading in Haskell
+</h1>
+<ul>
+<li class="block"><div class="code"><code class="Prelude">:t (*)</code>
+(*) :: Num a =&gt; a -&gt; a -&gt; a
+<code class="Prelude">let square x = x * x</code><br><code class="Prelude">:t square</code>
+square :: Num a =&gt; a -&gt; a
+</div>
+
+</li><li>The new function "inherits" the overloading of the operator...
+
+</li><li>The <div class="codequote"><div class="code"><pre><var class="var">square</var></pre></div></div> function will work on <em>any</em> type in the
+<div class="codequote"><div class="code"><pre><b class="tcon">Num</b></pre></div></div> class, even types that haven't been defined yet!
+
+</li><li>As a more illustrative example, consider
+
+<ul>
+<li class="block"><div class="code"><pre><var class="var">sort</var> <b>::</b> <b class="tcon">Ord</b> <var class="tvar">a</var> <b>=&gt;</b> [<var class="tvar">a</var>] <b>-&gt;</b> [<var class="tvar">a</var>]
+</pre></div></li></ul>
+</li><li>that "inherts" the overloading of the <div class="codequote"><!--exp lex--><div class="code"><pre><var class="varop">&lt;=</var></pre></div></div> operator...
+</li></ul></div>
+Page 4
+<div class="page"><h1>Type classes and instances
+</h1>
+<ul>
+<li>A <em>type class</em> declares a set of <em>methods</em>, i.e. a
+   set of related overloaded functions and operators.
+
+</li><li>Here is the definition of the predefined <div class="codequote"><div class="code"><pre><b class="tcon">Num</b></pre></div></div> class:
+
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Num</b> <var class="tvar">a</var> <b>where</b>
+   (<var class="varop">+</var>), (<var class="varop">*</var>), (<var class="varop">-</var>) <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var>
+   <var class="var">negate</var>, <var class="var">abs</var>, <var class="var">signum</var> <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var>
+   <var class="var">fromInteger</var> <b>::</b> <b class="tcon">Integer</b> <b>-&gt;</b> <var class="tvar">a</var>
+   <span class="cmnt">-- ...
+</span></pre></div></li></ul>
+</li><li>An <em>instance declaration</em> provides implementations of methods
+for a specific type:
+
+<ul>
+<li class="block"><div class="code"><pre><b>instance</b> <b class="tcon">Num</b> <b class="tcon">Int</b>     <b>where</b> <span class="cmnt">-- ...
+</span><b>instance</b> <b class="tcon">Num</b> <b class="tcon">Integer</b> <b>where</b> <span class="cmnt">-- ...
+</span><b>instance</b> <b class="tcon">Num</b> <b class="tcon">Double</b>  <b>where</b> <span class="cmnt">-- ...
+</span><b>instance</b> <b class="tcon">Num</b> <b class="tcon">Float</b>   <b>where</b> <span class="cmnt">-- ...
+</span></pre></div></li></ul>
+</li><li>Note: in spite of the similar terminology, type classes in Haskell are
+for overloading, not for objects, like in object oriented languages.
+</li></ul></div>
+Page 5
+<div class="page"><h1>The Eq class
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Eq</b> <var class="tvar">a</var> <b>where</b>
+  (<var class="varop">==</var>), (<var class="varop">/=</var>) <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> <b class="tcon">Bool</b>
+  
+  <var class="var">a</var><var class="varop">/=</var><var class="var">b</var> <b>=</b> <var class="var">not</var> (<var class="var">a</var><var class="varop">==</var><var class="var">b</var>) <span class="cmnt">-- default implementation
+</span>  <var class="var">a</var><var class="varop">==</var><var class="var">b</var> <b>=</b> <var class="var">not</var> (<var class="var">a</var><var class="varop">/=</var><var class="var">b</var>) <span class="cmnt">-- default implementation
+</span>
+<b>instance</b> <b class="tcon">Eq</b> <b class="tcon">Int</b>    <b>where</b> <span class="cmnt">-- ...
+</span><b>instance</b> <b class="tcon">Eq</b> <b class="tcon">Double</b> <b>where</b> <span class="cmnt">-- ...
+</span><b>instance</b> <b class="tcon">Eq</b> <b class="tcon">Char</b>   <b>where</b> <span class="cmnt">-- ...
+</span><span class="cmnt">-- There are instances for almost all predefined types
+</span></pre></div>
+</li><li>Quiz: which types do <em>not</em> support equality tests?
+</li></ul></div>
+Page 6
+<div class="page"><h1>Defining your own instances
+</h1>
+<ul>
+<li>Example of how to define an instance of class <div class="codequote"><div class="code"><pre><b class="tcon">Eq</b></pre></div></div>
+
+</li><li class="block"><div class="code"><pre><b>data</b> <b class="tcon">TrafficLight</b> <b>=</b> <b class="con">Red</b> <b>|</b> <b class="con">Yellow</b> <b>|</b> <b class="con">Green</b>
+
+<b>instance</b> <b class="tcon">Eq</b> <b class="tcon">TrafficLight</b> <b>where</b>
+  <b class="con">Red</b>    <var class="varop">==</var> <b class="con">Red</b>    <b>=</b> <b class="con">True</b>
+  <b class="con">Yellow</b> <var class="varop">==</var> <b class="con">Yellow</b> <b>=</b> <b class="con">True</b>
+  <b class="con">Green</b>  <var class="varop">==</var> <b class="con">Green</b>  <b>=</b> <b class="con">True</b>
+  <b>_</b>      <var class="varop">==</var> <b>_</b>      <b>=</b> <b class="con">False</b></pre></div></li></ul></div>
+Page 7
+<div class="page"><h1>Equality instance for pairs
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>instance</b> (<b class="tcon">Eq</b> <var class="tvar">a</var>,<b class="tcon">Eq</b> <var class="tvar">b</var>) <b>=&gt;</b> <b class="tcon">Eq</b> (<var class="tvar">a</var>,<var class="tvar">b</var>) <b>where</b>
+  (<var class="var">x1</var>,<var class="var">y1</var>) <var class="varop">==</var> (<var class="var">x2</var>,<var class="var">y2</var>) <b>=</b> <var class="var">x1</var><var class="varop">==</var><var class="var">x2</var> <var class="varop">&amp;&amp;</var> <var class="var">y1</var><var class="varop">==</var><var class="var">y2</var></pre></div>
+</li><li>Pairs can be tested for equality if both parts can be tested for equality.
+
+<ul>
+<li>Similarly for larger tuples.
+
+</li><li>Note: this definition <em>is not</em> recursive.
+</li></ul></li></ul></div>
+Page 8
+<div class="page"><h1>Equality instance for lists
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>instance</b> <b class="tcon">Eq</b> <var class="tvar">a</var> <b>=&gt;</b> <b class="tcon">Eq</b> [<var class="tvar">a</var>] <b>where</b>
+  []   <var class="varop">==</var> []   <b>=</b> <b class="con">True</b>
+  <var class="var">x</var><b>:</b><var class="var">xs</var> <var class="varop">==</var> <var class="var">y</var><b>:</b><var class="var">ys</var> <b>=</b> <var class="var">x</var><var class="varop">==</var><var class="var">y</var> <var class="varop">&amp;&amp;</var> <var class="var">xs</var><var class="varop">==</var><var class="var">ys</var>
+  <b>_</b>    <var class="varop">==</var> <b>_</b>    <b>=</b> <b class="con">False</b></pre></div>
+</li><li>List can be tested for equality if the elements can be tested for equality
+
+</li><li>Note: this definition <em>is</em> recursive.
+</li></ul></div>
+Page 9
+<div class="page"><h1>The Ord class
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Eq</b> <var class="tvar">a</var> <b>=&gt;</b> <b class="tcon">Ord</b> <var class="tvar">a</var> <b>where</b>
+  (<var class="varop">&lt;</var>), (<var class="varop">&lt;=</var>), (<var class="varop">&gt;</var>), (<var class="varop">&gt;=</var>) <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> <b class="tcon">Bool</b>
+  <var class="var">compare</var> <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> <b class="tcon">Ordering</b>
+  <var class="var">max</var>, <var class="var">min</var> <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var>
+
+<b>data</b> <b class="tcon">Ordering</b> <b>=</b> <b class="con">LT</b> <b>|</b> <b class="con">EQ</b> <b>|</b> <b class="con">GT</b></pre></div>
+</li><li>There are instances for almost all predefined types.
+
+</li><li class="block"><div class="codequote"><div class="code"><pre><b class="tcon">Ord</b></pre></div></div> is a <em>subclass</em> of <div class="codequote"><div class="code"><pre><b class="tcon">Eq</b></pre></div></div>.
+
+<ul>
+<li>All types that are in the <div class="codequote"><div class="code"><pre><b class="tcon">Ord</b></pre></div></div> class are also in the <div class="codequote"><div class="code"><pre><b class="tcon">Eq</b></pre></div></div> class.
+
+</li><li>It is expected that when <div class="codequote"><div class="code"><pre><var class="var">x</var><var class="varop">==</var><var class="var">y</var></pre></div></div> returns <div class="codequote"><div class="code"><pre><b class="con">True</b></pre></div></div>,
+then <div class="codequote"><div class="code"><pre><var class="var">compare</var> <var class="var">x</var> <var class="var">y</var></pre></div></div> returns <div class="codequote"><div class="code"><pre><b class="con">EQ</b></pre></div></div>.
+</li></ul></li></ul></div>
+Page 10
+<div class="page"><h1>The Enum class
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Enum</b> <var class="tvar">a</var> <b>where</b>
+  <var class="var">pred</var>, <var class="var">succ</var>     <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var>
+  <var class="var">toEnum</var>         <b>::</b> <b class="tcon">Int</b> <b>-&gt;</b> <var class="tvar">a</var>
+  <var class="var">fromEnum</var>       <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <b class="tcon">Int</b>
+  <var class="var">enumFrom</var>       <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> [<var class="tvar">a</var>]
+  <var class="var">enumFromTo</var>     <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> [<var class="tvar">a</var>]
+  <span class="cmnt">-- ...
+</span></pre></div>
+</li><li>It's enough to define <div class="codequote"><div class="code"><pre><var class="var">fromEnum</var></pre></div></div> and <div class="codequote"><div class="code"><pre><var class="var">toEnum</var></pre></div></div>, the other methods have
+default implementations.
+
+</li><li>Instances: <div class="codequote"><div class="code"><pre><b class="tcon">Bool</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Int</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Integer</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Float</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Double</b></pre></div></div>, …
+</li></ul></div>
+Page 11
+<div class="page"><h1>The enumeration syntax
+</h1><h2>Enumerations can be used for any type in the <div class="codequote"><div class="code"><pre><b class="tcon">Enum</b></pre></div></div> class, e.g.:
+</h2>
+<ul>
+<li class="block"><div class="codequote"><div class="code"><pre>[<span class="lit">1</span><b>..</b><span class="lit">5</span>] <var class="varop">==</var> [<span class="lit">1</span>,<span class="lit">2</span>,<span class="lit">3</span>,<span class="lit">4</span>,<span class="lit">5</span>]</pre></div></div>
+
+</li><li class="block"><div class="codequote"><!--exp lex--><div class="code"><pre>[<span class="lit">1</span><b>..</b>] <var class="varop">==</var> [<span class="lit">1</span>,<span class="lit">2</span>,<span class="lit">3</span>,<span class="lit">4</span>,<span class="lit">5</span>,<var class="varop">…</var>]</pre></div></div>
+
+</li><li class="block"><div class="codequote"><div class="code"><pre>[<span class="lit">'a'</span><b>..</b><span class="lit">'g'</span>] <var class="varop">==</var> <span class="lit">"abcdefg"</span></pre></div></div>
+
+</li><li class="block"><div class="codequote"><div class="code"><pre>[<span class="lit">0.5</span> <b>..</b> <span class="lit">3</span>] <var class="varop">==</var> [<span class="lit">0.5</span>,<span class="lit">1.5</span>,<span class="lit">2.5</span>,<span class="lit">3.5</span>]</pre></div></div> -- watch out for rounding errors…
+
+</li><li>This is syntactic sugar for the methods of the <div class="codequote"><div class="code"><pre><b class="tcon">Enum</b></pre></div></div> class:
+
+<ul>
+<li class="block"><div class="codequote"><div class="code"><pre>[<var class="var">x</var><b>..</b><var class="var">y</var>] <var class="varop">==</var> <var class="var">enumFromTo</var> <var class="var">x</var> <var class="var">y</var></pre></div></div>
+
+</li><li class="block"><div class="codequote"><div class="code"><pre>[<var class="var">x</var><b>..</b>] <var class="varop">==</var> <var class="var">enumFrom</var> <var class="var">x</var></pre></div></div>
+</li></ul></li></ul></div>
+Page 12
+<div class="page"><h1>The Bounded class
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Bounded</b> <var class="tvar">a</var> <b>where</b>
+  <var class="var">minBound</var>, <var class="var">maxBound</var> <b>::</b> <var class="tvar">a</var></pre></div>
+</li><li>Instances: <div class="codequote"><div class="code"><pre><b class="tcon">Bool</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Char</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Int</b></pre></div></div>, tuples
+
+</li><li>Not bounded: <div class="codequote"><div class="code"><pre><b class="tcon">Integer</b></pre></div></div>
+
+</li><li>Example: 
+
+</li><li class="block"><div class="code"><pre><var class="var">enumAll</var> <b>::</b> (<b class="tcon">Bounded</b> <var class="tvar">a</var>, <b class="tcon">Enum</b> <var class="tvar">a</var>) <b>=&gt;</b> [<var class="tvar">a</var>]
+<var class="var">enumAll</var> <b>=</b> [<var class="var">minBound</var> <b>..</b> <var class="var">maxBound</var>]
+</pre></div></li></ul></div>
+Page 13
+<div class="page"><h1>The Show and Read classes
+</h1>
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Show</b> <var class="tvar">a</var> <b>where</b>
+  <var class="var">show</var> <b>::</b> <var class="tvar">a</var> <b>-&gt;</b> <b class="tcon">String</b>
+  <span class="cmnt">-- some more functions...
+</span></pre></div>
+</li><li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Read</b> <var class="tvar">a</var> <b>where</b>
+  <var class="var">read</var> <b>::</b> <b class="tcon">String</b> <b>-&gt;</b> <var class="tvar">a</var>
+  <span class="cmnt">-- some more functions...
+</span></pre></div>
+</li><li>There are instances for almost all predefined types.
+
+</li><li>Note that for <div class="codequote"><div class="code"><pre><var class="var">read</var></pre></div></div>, which instance is used depends <em>not</em>
+on the type of the argument, but on how the result is used.
+</li></ul></div>
+Page 14
+<div class="page"><h1>Derived instances
+</h1>
+<ul>
+<li>For many predefined classes, in particular <div class="codequote"><div class="code"><pre><b class="tcon">Eq</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Ord</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Show</b></pre></div></div>, <div class="codequote"><div class="code"><pre><b class="tcon">Read</b></pre></div></div>,
+<div class="codequote"><div class="code"><pre><b class="tcon">Enum</b></pre></div></div> and <div class="codequote"><div class="code"><pre><b class="tcon">Bounded</b></pre></div></div>, there is a standard way to define instances.
+
+</li><li>The Haskell compiler knows how to define these instances.
+
+</li><li>So, when you define a new data type, you can get instances for free!
+
+<ul>
+<li class="block"><div class="code"><pre><b>data</b> <b class="tcon">Suit</b> <b>=</b> <b class="con">Spades</b> <b>|</b> <b class="con">Hearts</b> <b>|</b> <b class="con">Diamonds</b> <b>|</b> <b class="con">Clubs</b>
+            <b>deriving</b> (<b class="tcon">Eq</b>,<b class="tcon">Ord</b>,<b class="tcon">Show</b>,<b class="tcon">Read</b>,<b class="tcon">Enum</b>,<b class="tcon">Bounded</b>)
+</pre></div></li></ul></li></ul></div>
+Page 15
+<div class="page"><h1>Defining your own Show instance 1
+</h1><div class="code"><pre><b>data</b> <b class="tcon">Suit</b> <b>=</b> <b class="con">Spades</b> <b>|</b> <b class="con">Hearts</b> <b>|</b> <b class="con">Diamonds</b> <b>|</b> <b class="con">Clubs</b>
+            <b>deriving</b> (<b class="tcon">Eq</b>,<b class="tcon">Ord</b>,<b class="tcon">Enum</b>,<b class="tcon">Bounded</b>)
+
+<b>instance</b> <b class="tcon">Show</b> <b class="tcon">Suit</b> <b>where</b>
+  <var class="var">show</var> <b class="con">Spades</b>   <b>=</b> <span class="lit">"♠"</span>
+  <var class="var">show</var> <b class="con">Hearts</b>   <b>=</b> <span class="lit">"♥"</span>
+  <var class="var">show</var> <b class="con">Diamonds</b> <b>=</b> <span class="lit">"♦"</span>
+  <var class="var">show</var> <b class="con">Clubs</b>    <b>=</b> <span class="lit">"♣"</span></pre></div></div>
+Page 16
+<div class="page"><h1>Defining your own Show instance 2
+</h1><div class="code"><pre><b>data</b> <b class="tcon">Rank</b> <b>=</b> <b class="con">Numeric</b> <b class="tcon">Int</b> <b>|</b> <b class="con">Jack</b> <b>|</b> <b class="con">Queen</b> <b>|</b> <b class="con">King</b> <b>|</b> <b class="con">Ace</b>
+            <b>deriving</b> (<b class="tcon">Eq</b>,<b class="tcon">Ord</b>)
+
+<b>instance</b> <b class="tcon">Show</b> <b class="tcon">Rank</b> <b>where</b>
+  <var class="var">show</var> (<b class="con">Numeric</b> <var class="var">n</var>) <b>=</b> <var class="var">show</var> <var class="var">n</var>
+  <var class="var">show</var> <b class="con">Jack</b>        <b>=</b> <span class="lit">"J"</span>
+  <var class="var">show</var> <b class="con">Queen</b>       <b>=</b> <span class="lit">"Q"</span>
+  <var class="var">show</var> <b class="con">King</b>        <b>=</b> <span class="lit">"K"</span>
+  <var class="var">show</var> <b class="con">Ace</b>         <b>=</b> <span class="lit">"A"</span></pre></div></div>
+Page 17
+<div class="page"><h1>Defining your own Show instance 3
+</h1><div class="code"><pre><b>data</b> <b class="tcon">Card</b> <b>=</b> <b class="con">Card</b> {<var class="var">rank</var><b>::</b><b class="tcon">Rank</b>, <var class="var">suit</var><b>::</b><b class="tcon">Suit</b>}
+
+<b>instance</b> <b class="tcon">Show</b> <b class="tcon">Card</b> <b>where</b>
+  <var class="var">show</var> (<b class="con">Card</b> <var class="var">r</var> <var class="var">s</var>) <b>=</b> <var class="var">show</var> <var class="var">r</var><var class="varop">++</var><var class="var">show</var> <var class="var">s</var></pre></div></div>
+Page 18
+<div class="page"><h1>Defining your own Show instance 4
+</h1><div class="code"><pre><b>data</b> <b class="tcon">Hand</b> <b>=</b> <b class="con">Empty</b> <b>|</b> <b class="con">Add</b> <b class="tcon">Card</b> <b class="tcon">Hand</b>
+
+<b>instance</b> <b class="tcon">Show</b> <b class="tcon">Hand</b> <b>where</b>
+  <var class="var">show</var> <b class="con">Empty</b> <b>=</b> <span class="lit">""</span>
+  <var class="var">show</var> (<b class="con">Add</b> <var class="var">c</var> <var class="var">h</var>) <b>=</b> <var class="var">show</var> <var class="var">c</var> <var class="varop">++</var><span class="lit">" "</span><var class="varop">++</var><var class="var">show</var> <var class="var">h</var></pre></div></div>
+Page 19
+<div class="page"><h1>Before and after
+</h1>
+<ul>
+<li>With <code><b class="kw">deriving</b> <b class="tcon">Show</b></code>:
+
+<ul>
+<li class="block"><div class="code Main"><code>example_hand_2</code>
+Add (Card {rank = Ace, suit = Spades}) (Add (Card {rank = King, suit = Clubs}) Empty)
+</div>
+</li></ul>
+</li><li>With the hand-written <div class="codequote"><div class="code"><pre><b class="tcon">Show</b></pre></div></div> instances:
+
+<ul>
+<li class="block"><div class="code Main"><code>example_hand_2</code>
+A♠ K♣ 
+</div>
+</li></ul></li></ul></div>
+Page 20
+<div class="page"><h1>Defining your own class 1
+</h1><h2>A class to enumerate all the values of "small" types.
+</h2><div class="code"><pre><b>class</b> <b class="tcon">Small</b> <var class="tvar">a</var> <b>where</b>
+  <var class="var">values</var> <b>::</b> [<var class="tvar">a</var>]
+
+<b>instance</b> <b class="tcon">Small</b> <b class="tcon">Bool</b> <b>where</b>
+  <var class="var">values</var> <b>=</b> [<b class="con">False</b>,<b class="con">True</b>]
+
+<b>instance</b> <b class="tcon">Small</b> <b class="tcon">Suit</b> <b>where</b>
+  <var class="var">values</var> <b>=</b> [<var class="var">maxBound</var> <b>..</b> <var class="var">minBound</var>]
+
+<b>instance</b> <b class="tcon">Small</b> <b class="tcon">Rank</b> <b>where</b>
+  <var class="var">values</var> <b>=</b> (<var class="varop">...</var>)
+
+<b>instance</b> <b class="tcon">Small</b> <b class="tcon">Card</b> <b>where</b>
+  <var class="var">values</var> <b>=</b> [<b class="con">Card</b> <var class="var">r</var> <var class="var">s</var> <b>|</b> <var class="var">s</var><b>&lt;-</b><var class="var">values</var>, <var class="var">r</var><b>&lt;-</b><var class="var">values</var>]
+</pre></div></div>
+Page 21
+<div class="page"><h1>Defining your own class 2
+</h1><h2>Exhaustive Testing
+</h2>
+<ul>
+<li class="block"><div class="code"><pre><b>class</b> <b class="tcon">Testable</b> <var class="tvar">prop</var> <b>where</b>
+  <var class="var">exhaustiveTest</var> <b>::</b> <var class="tvar">prop</var> <b>-&gt;</b> <b class="tcon">Bool</b>
+
+<b>instance</b> <b class="tcon">Testable</b> <b class="tcon">Bool</b> <b>where</b>
+  <var class="var">exhaustiveTest</var> <var class="var">b</var> <b>=</b> <var class="var">b</var>
+
+<b>instance</b> (<b class="tcon">Small</b> <var class="tvar">a</var>,<b class="tcon">Testable</b> <var class="tvar">prop</var>) <b>=&gt;</b> <b class="tcon">Testable</b> (<var class="tvar">a</var><b>-&gt;</b><var class="tvar">prop</var>) <b>where</b>
+  <var class="var">exhaustiveTest</var> <var class="var">f</var> <b>=</b> <var class="var">and</var> [<var class="var">exhaustiveTest</var> (<var class="var">f</var> <var class="var">x</var>)<b>|</b><var class="var">x</var><b>&lt;-</b><var class="var">values</var>]
+</pre></div>
+</li><li>Exhaustive testing of functions is better than random testing!
+
+<ul>
+<li>Unfortunately it's only practical when the argument types are
+sufficiently small...
+</li></ul></li></ul></div>
+Page 22
+<div class="page"><h1>Ambiguity
+</h1>
+<ul>
+<li>Consider
+
+<ul>
+<li class="block"><div class="code"><pre><var class="var">f</var> <b>::</b> <b class="tcon">String</b> <b>-&gt;</b> <b class="tcon">String</b>
+<var class="var">f</var> <var class="var">s</var> <b>=</b> <var class="var">show</var> (<var class="var">read</var> <var class="var">s</var>)
+</pre></div></li></ul>
+</li><li>Will this work? Compare with
+
+<ul>
+<li class="block"><div class="code"><pre><var class="var">square</var> <b>::</b> <b class="tcon">Num</b> <var class="tvar">a</var> <b>=&gt;</b> <var class="tvar">a</var> <b>-&gt;</b> <var class="tvar">a</var>
+<var class="var">square</var> <var class="var">x</var> <b>=</b> <var class="var">x</var> <var class="varop">*</var> <var class="var">x</var></pre></div></li></ul></li></ul></div>
+Page 23
+<div class="page"><h1>Numeric literals, monomorphism and defaulting
+</h1>
+<ul>
+<li>Definitions without arguments and without type signatures are not allowed
+to be overloaded. This is called <em>the monomorphism restriction</em>.
+
+<ul>
+<li class="block"><div class="code"><pre><var class="var">answer</var> <b>=</b> <span class="lit">6</span><var class="varop">*</var><span class="lit">7</span></pre></div></li></ul>
+</li><li>Numeric literals are overloaded, so you would expect
+<div class="codequote"><div class="code"><pre><var class="var">answer</var> <b>::</b> <b class="tcon">Num</b> <var class="tvar">a</var> <b>=&gt;</b> <var class="tvar">a</var></pre></div></div>,
+but one specific type will be chosen
+depending on how you use <div class="codequote"><div class="code"><pre><var class="var">answer</var></pre></div></div>.
+
+</li><li>If nothing else determines which type <code>answer</code> should have,
+<em>defaulting</em> rules specific for the <div class="codequote"><div class="code"><pre><b class="tcon">Num</b></pre></div></div> class kick in, and
+you get <div class="codequote"><div class="code"><pre><var class="var">answer</var> <b>::</b> <b class="tcon">Integer</b></pre></div></div>.
+
+</li><li>For code entered directly GHCi, the monomorphism restriction is not used,
+and there are extended defaulting rules to avoid ambiguities.
+</li></ul></div>
+Page 24
+<div class="page"><h1>A few notes on type classes
+</h1>
+<ul>
+<li>Haskell has a lot in common with preceding functional languages,
+notably <a href="https://en.wikipedia.org/wiki/Miranda_%28programming_language%29">Miranda</a>,
+<a href="https://en.wikipedia.org/wiki/Standard_ML">Standard ML</a>
+and <a href="https://en.wikipedia.org/wiki/Lazy_ML">Lazy ML</a>.
+
+</li><li><strong>Type classes</strong> was the main novel feature in Haskell.
+
+</li><li>Type classes were primarily intended as an improvement over how
+Standard ML handled equality and numeric operators.
+
+</li><li>Then type classes got extended (with constructor classes,
+multi-parameter classes, functional depdendencies, ...)
+and are now used for a lot more things than anyone anticipated.
+
+</li><li>But David Turner (creator of Miranda)
+<a href="https://youtu.be/-MHOgyd-1lc?t=55m40s">thinks type classes were
+a mistake</a> :-)
+</li></ul></div>
+Page 25
+<div class="page"><h1>Overloading in Standard ML
+</h1>
+<ul>
+<li>Standard ML has one built-in type class for equality
+
+<ul>
+<li class="block"><div class="code"><pre>(<var class="varop">==</var>) <b>::</b> ''a -&gt; ''a -&gt; Bool
+</pre></div></li></ul>
+</li><li>Predefined numeric operators are overloaded,
+
+<ul>
+<li class="block"><div class="code"><pre>(<var class="varop">*</var>) <b>::</b> <b class="tcon">Int</b> <b>-&gt;</b> <b class="tcon">Int</b> <b>-&gt;</b> <b class="tcon">Int</b>
+(<var class="varop">*</var>) <b>::</b> <b class="tcon">Double</b> <b>-&gt;</b> <b class="tcon">Double</b> <b>-&gt;</b> <b class="tcon">Double</b></pre></div></li></ul>
+</li><li>but user-defined numeric functions have to choose one specific type.
+</li></ul></div>
+Page 26
+<div class="page"><h1>Type classes in Haskell vs OO languages
+</h1>
+<ul>
+<li>We talk about classes, instances and methods in Haskell, so
+at first sight, type classes in Haskell might seem similar to classes in
+object oriented languages.
+
+</li><li>But they serve different purposes.
+
+<ul>
+<li>Type classes in Haskell are used to introduce overloaded functions.
+
+</li><li>Classes in object oriented langauges are used to describe objects...
+</li></ul></li></ul></div>
+</body></html>
