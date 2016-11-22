@@ -145,7 +145,18 @@ prop_replace xs (n,x) = length xs == length rep &&
                   rep = xs !!= (n,x)
 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
-update _ _ _ = undefined
+update sudoku (i,j) val = Sudoku $ rows' !!= (i,updated)
+  where
+    rows' = rows sudoku
+    updated = rows' !! i !!= (j,val)
+
+prop_update :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_update sudoku (i,j) val = prop_replace rows' (i,updated) &&
+                              prop_replace (rows' !! i) (j,val)
+where
+  rows' = rows sudoku
+  updated = rows' !! i !!= (j,val)
+
 
 candidates :: Sudoku -> Pos -> [Int]
 candidates _ _ = undefined
