@@ -160,12 +160,23 @@ prop_update sudoku (i,j) val =
                       and [rows' !! i !! m == (new !! i !! m)
                           | m <- [0..8], not (m==j)] &&
                       new !! i !! j == val
-
   where
     rows' = rows sudoku
     new = rows (update sudoku (i,j) val)
 
--- Given a sudoku and a blank position, return a list of legal numbers
+-- TODO fråga om detta! Baka in denna i metoden ovan, eller hur ska man
+-- annars få quickCheck att bara testa rätt värden?
+prop_update' :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_update' sudoku (i,j) val = prop_update sudoku
+                                (abs (mod i 9), abs (mod j 9)) (validJ val)
+  where
+    validJ (Just v) =  Just (abs (mod v 9) + 1)
+    validJ Nothing = Nothing
+
+
+-- hämta ut elementet
+-- få ut dess block, anropar isOkayBlock för varje block
+
 candidates :: Sudoku -> Pos -> [Int]
 candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
   where
@@ -177,10 +188,6 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
         col = blocks' !! (j+9)
         block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
 
-prop_candidates :: Sudoku -> Pos -> Bool
-prop_candidates sudoku pos = all isOkay updatedSudoku && all isSudoku updatedSudoku
-  where
-      updatedSudoku = [update sudoku pos (Just x)| x <- (candidates sudoku pos)]
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
