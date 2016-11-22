@@ -10,6 +10,24 @@ import Data.List
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
  deriving ( Show, Eq )
 
+ -- TODO ta bort
+example :: Sudoku
+example =
+    Sudoku
+      [ [j 3,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
+      , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
+      , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
+      , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
+      , [j 4,n  ,n  ,j 5,n  ,j 2,n  ,n  ,j 9]
+      , [j 2,j 7,n  ,j 4,j 6,n  ,n  ,n  ,n  ]
+      , [n  ,n  ,j 5,j 3,n  ,j 8,j 9,n  ,n  ]
+      , [n  ,j 8,j 3,n  ,n  ,n  ,n  ,j 6,n  ]
+      , [n  ,n  ,j 7,j 6,j 9,n  ,n  ,j 4,j 3]
+      ]
+  where
+    n = Nothing
+    j = Just
+
 -- allBlankSudoku is a sudoku with just blanks
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
@@ -102,7 +120,10 @@ isOkay sudoku = all isOkayBlock (blocks sudoku)
 type Pos = (Int,Int)
 
 blanks :: Sudoku -> [Pos]
-blanks _ = undefined
+blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
+                    isNothing ((rows' !! i) !! j)]
+  where
+    rows' = rows sudoku
 
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) xs (n,_) | n < 0 || n > (length xs - 1) =
