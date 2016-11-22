@@ -105,7 +105,21 @@ blanks :: Sudoku -> [Pos]
 blanks _ = undefined
 
 (!!=) :: [a] -> (Int,a) -> [a]
-(!!=) _ _ = undefined
+(!!=) xs (n,_) | n < 0 || n > (length xs - 1) =
+                        error "Index out of bounds"
+(!!=) xs (n,x) | otherwise = h ++ x:(drop 1 t)
+  where (h,t) = splitAt n xs
+
+-- TODO: Haskell won't accept the name prop_!!=
+-- Check that the length is the same, and that all values other than
+-- the chosen one is unaffected. The chosen one should be changed,
+prop_replace :: [Integer] -> (Int,Integer) -> Bool
+prop_replace xs (n,x) = length xs == length rep &&
+                and [xs !! i == (rep !! i) |
+                      i<-[0.. (length xs -1)], not (i == n)] &&
+                rep !! n == x
+                where
+                  rep = xs !!= (n,x)
 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update _ _ _ = undefined
