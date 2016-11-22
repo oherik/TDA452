@@ -3,6 +3,7 @@ module Sudoku where
 import Test.QuickCheck
 import Data.Maybe
 import Data.Char
+import Data.List
 
 -------------------------------------------------------------------------
 
@@ -22,64 +23,32 @@ isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
       rows' = rows sudoku
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
-isSolved :: Sudoku -> Bool --TODO: should isSudoku be here or not?
+isSolved :: Sudoku -> Bool
 isSolved sudoku = all (all (not . isNothing)) (rows sudoku)
-
-
--- example sudoku (TODO: remove!)
-example :: Sudoku
-example =
-    Sudoku
-      [ [j 3,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
-      , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
-      , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
-      , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
-      , [j 4,n  ,n  ,j 5,n  ,j 2,n  ,n  ,j 9]
-      , [j 2,j 7,n  ,j 4,j 6,n  ,n  ,n  ,n  ]
-      , [n  ,n  ,j 5,j 3,n  ,j 8,j 9,n  ,n  ]
-      , [n  ,j 8,j 3,n  ,n  ,n  ,n  ,j 6,n  ]
-      , [n  ,n  ,j 7,j 6,j 9,n  ,n  ,j 4,j 3]
-      ]
-  where
-    n = Nothing
-    j = Just
-
 
 -------------------------------------------------------------------------
 
 -- printSudoku sud prints a representation of the sudoku sud on the screen
 printSudoku :: Sudoku -> IO ()
 printSudoku sudoku = do
-   sequence_ $ map putStrLn [map maybeToChar row | row <- rows sudoku]
-
---TODO or use the lambda function
--- (\ c -> if isNothing c then '.' else chr $ (fromJust c) + (ord '0'))
--- instad of maybeToChar. Might look fancier, but debugging using QuickCheck
--- will be more difficult
-
-maybeToChar :: Maybe Int -> Char
-maybeToChar Nothing = '.'
-maybeToChar (Just j) = chr $ j + ord '0'
+   sequence_ $ map putStrLn [map
+    (\ c -> if isNothing c then '.' else chr $ (fromJust c) + (ord '0'))
+    row | row <- rows sudoku]
 
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do
                 s <- readFile path
-                let sudoku = Sudoku [map charToMaybe line | line <- lines s]
+                let sudoku = Sudoku [map
+                      (\ c -> if c == '.' then Nothing
+                        else Just $ ord c - ord '0')
+                      line | line <- lines s]
                 if isSudoku sudoku
                   then return sudoku
                 else error "Not a valid sudoku"
 
---TODO could use a lambda function here aswell
-
-charToMaybe :: Char -> Maybe Int
-charToMaybe '.' = Nothing
-charToMaybe x  = Just $ ord x - ord '0'
-
 -------------------------------------------------------------------------
-
-
 
 -- cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
@@ -89,7 +58,7 @@ cell = frequency [(1, rJust),(9, return Nothing)]
 -- an instance for generating Arbitrary Sudokus
 instance Arbitrary Sudoku where
   arbitrary =
-    do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
+    do rows <- sequence [ sequence [ cell | j <- [1..9]] | i <- [1..9]]
        return (Sudoku rows)
 
 -- Checks if the generated sudoku is a real sudoku
@@ -111,17 +80,10 @@ isOkayBlock (x:xs) = if elem x xs then False
 blocks :: Sudoku -> [Block]
 blocks sudoku = rows' ++ columns' ++ blocks'
   where rows' = (rows sudoku)
-        columns' = [getAllColBlock i sudoku | i <- [0..8]]
-        blocks' = [get3x3Block x y sudoku | x <- [0, 3, 6], y <- [0,3,6]]
-
-
-getAllColBlock :: Int -> Sudoku -> Block -- TODO egen funktion?
-getAllColBlock i (Sudoku rows) = [ row!!i | row <- rows]
-
-get3x3Block :: Int -> Int -> Sudoku -> Block
-get3x3Block x y (Sudoku rows) = concat [ take 3 (drop x row)
-                  | row <- take 3 (drop y rows)]
-
+        columns' = transpose rows'
+        blocks' = [(concat [ take 3 (drop x row)
+                  | row <- take 3 (drop y rows')])
+                  | x <- [0, 3, 6], y <- [0,3,6]]
 
 -- Property that states that for each Sudoku,
 --there are 3*9 blocks and each block has exactly 9 cells
