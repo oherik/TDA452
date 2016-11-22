@@ -172,7 +172,7 @@ candidates :: Sudoku -> Pos -> [Int]
 candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
   where
     isOkPos :: Sudoku -> Bool
-    isOkPos sudoku' = and $ map isOkayBlock [row, col, block]
+    isOkPos sudoku' = all isOkayBlock [row, col, block]
       where
         blocks' = blocks sudoku'
         row = blocks' !! i
