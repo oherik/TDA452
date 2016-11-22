@@ -179,6 +179,10 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
         col = blocks' !! (j+9)
         block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
 
+prop_candidates :: Sudoku -> Pos -> Bool
+prop_candidates sudoku pos = all isOkay updatedSudoku && all isSudoku updatedSudoku
+  where
+      updatedSudoku = [update sudoku pos (Just x)| x <- (candidates sudoku pos)]
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
