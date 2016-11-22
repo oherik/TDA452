@@ -99,6 +99,8 @@ isOkay sudoku = all isOkayBlock (blocks sudoku)
 
 -------------------------------------------------------------------------
 
+type Pos = (Int,Int)
+
 blanks :: Sudoku -> [Pos]
 blanks _ = undefined
 
@@ -112,8 +114,6 @@ candidates :: Sudoku -> Pos -> [Int]
 candidates _ _ = undefined
 
 -------------------------------------------------------------------------
-
-type Pos = (Int,Int)
 
 solve :: Sudoku -> Maybe Sudoku
 solve _ = undefined
