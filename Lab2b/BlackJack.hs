@@ -2,8 +2,8 @@ module BlackJack where
   import Cards
   import RunGame
   import System.Random
-  import Test.QuickCheck hiding (shuffle) -- To avoid conflict with our
-                                          -- shuffle function
+  --import Test.QuickCheck hiding (shuffle) -- To avoid conflict with our
+    --                                      -- shuffle function
 
 ---------------------------------------
  -- A
@@ -76,8 +76,6 @@ module BlackJack where
   -- Given two hands, puts the first one on top of the second one
   (<+) :: Hand -> Hand -> Hand
   (<+) Empty hand = hand
-  (<+) hand Empty = hand
-  (<+) (Add topLast Empty) bottom = (Add topLast bottom)
   (<+) (Add topCard top) bottom = (Add topCard (top <+ bottom))
 
   prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
@@ -96,19 +94,17 @@ module BlackJack where
 
   -- Given a deck and a hand, draw a card from the deck and puts it on the hand
   draw :: Hand -> Hand -> (Hand,Hand)
-  draw Empty _ = error "draw: The deck is empty"
-  draw (Add topDeckCard restOfDeck) hand =
-          (restOfDeck, (Add topDeckCard hand))
+  draw deck hand = (restOfDeck, (Add card hand))
+    where (card,restOfDeck) = removeCard deck 0
 
   -- Plays the bank, starting with an empty hand
   playBank :: Hand -> Hand
   playBank deck = playBank' deck Empty
-
-  -- The bank draws from the deck until its hand value is 16 or above
-  playBank' :: Hand -> Hand -> Hand
-  playBank' deck bankHand | value bankHand < 16 =
+    where
+        playBank' :: Hand -> Hand -> Hand
+        playBank' deck bankHand | value bankHand < 16 =
                                     uncurry playBank' (draw deck bankHand)
-                       | otherwise = bankHand
+                                | otherwise = bankHand
 
   -- Given a random generator and a hand, shuffle the cards
   -- return the shuffled hand
@@ -121,24 +117,28 @@ module BlackJack where
 
   --Removes the n:th card from a deck
   removeCard :: Hand -> Integer -> (Card, Hand)
-  removeCard _ n | n<0 = error "removeCard: negative index"
+  removeCard _ n | n<0 = error "remove  Card: negative index"
   removeCard hand n = removeCard' Empty hand n
-
-  -- topPart is reversed in this manner, making it a stack. This means we
-  -- need the addReverse function, instead of the previously created (<+)
-  removeCard' :: Hand -> Hand -> Integer -> (Card, Hand)
-  removeCard' topPart Empty n = error "removeCard: index exceeds hand size"
-  removeCard' topPart (Add c bottomPart) 0 =
-                        (c, topPart `addReverse` bottomPart)
-  removeCard' topPart (Add c bottomPart) n =
-                        removeCard' (Add c topPart) bottomPart (n-1)
+    where
+      removeCard' :: Hand -> Hand -> Integer -> (Card, Hand)
+      removeCard' topPart Empty n =
+          error "removeCard: index exceeds hand size"
+      removeCard' topPart (Add c bottomPart) 0 =
+                          (c, topPart `addReverse` bottomPart)
+      removeCard' topPart (Add c bottomPart) n =
+                          removeCard' (Add c topPart) bottomPart (n-1)
 
   -- Adds one hand on top of the other in reverse order
   addReverse :: Hand -> Hand -> Hand
-  addReverse Empty hand = hand
-  addReverse hand Empty = hand
-  addReverse (Add topLast Empty) bottom = (Add topLast bottom)
-  addReverse (Add topCard top) bottom = addReverse top (Add topCard bottom)
+  addReverse h1 h2 = reverseHand h1 <+ h2
+
+  -- Reverses a hand
+  reverseHand :: Hand -> Hand
+  reverseHand h = reverseHand' h Empty
+    where
+      reverseHand' :: Hand -> Hand -> Hand
+      reverseHand' Empty h' = h'
+      reverseHand' (Add c r) h' = reverseHand' r (Add c h')
 
   -- Check if a given card is in the hand
   belongsTo :: Card -> Hand -> Bool
