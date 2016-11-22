@@ -149,11 +149,17 @@ update sudoku (i,j) val = Sudoku $ rows' !!= (i,updated)
     updated = rows' !! i !!= (j,val)
 
 prop_update :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_update sudoku (i,j) val = prop_replace rows' (i,updated) &&
-                              prop_replace (rows' !! i) (j,val)
-where
-  rows' = rows sudoku
-  updated = rows' !! i !!= (j,val)
+prop_update sudoku (i,j) val =
+                      isSudoku sudoku &&
+                      and [rows' !! n == (new !! n)
+                          | n <- [0..8], not (n==i)] &&
+                      and [rows' !! i !! m == (new !! i !! m)
+                          | m <- [0..8], not (m==j)] &&
+                      new !! i !! j == val
+
+  where
+    rows' = rows sudoku
+    new = rows (update sudoku (i,j) val)
 
 
 candidates :: Sudoku -> Pos -> [Int]
