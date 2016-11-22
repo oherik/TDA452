@@ -169,7 +169,15 @@ prop_update sudoku (i,j) val =
 -- få ut dess block, anropar isOkayBlock för varje block
 
 candidates :: Sudoku -> Pos -> [Int]
-candidates sudoku pos = [ x | x<- [1..9], isOkay (update sudoku pos (Just x))]
+candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
+  where
+    isOkPos :: Sudoku -> Bool
+    isOkPos sudoku' = and $ map isOkayBlock [row, col, block]
+      where
+        blocks' = blocks sudoku'
+        row = blocks' !! i
+        col = blocks' !! (j+9)
+        block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
 
 -------------------------------------------------------------------------
 
