@@ -165,9 +165,7 @@ prop_update sudoku (i,j) val =
     rows' = rows sudoku
     new = rows (update sudoku (i,j) val)
 
--- hämta ut elementet
--- få ut dess block, anropar isOkayBlock för varje block
-
+-- Given a sudoku and a blank position, return a list of legal numbers
 candidates :: Sudoku -> Pos -> [Int]
 candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
   where
