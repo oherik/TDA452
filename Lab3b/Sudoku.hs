@@ -119,10 +119,12 @@ isOkay sudoku = all isOkayBlock (blocks sudoku)
 
 type Pos = (Int,Int)
 
+-- Given a Sudoku returns a list of the positions of the blanks elements
 blanks :: Sudoku -> [Pos]
 blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
                     isNothing ((rows sudoku !! i) !! j)]
 
+-- Proprtery that states that all cells in the blanks list are blanks
 prop_blanks :: Sudoku -> Bool
 prop_blanks sudoku = all (\element -> isNothing (((rows sudoku) !! fst element) !! snd element)) (blanks sudoku)
 
@@ -163,9 +165,11 @@ prop_update sudoku (i,j) val =
     rows' = rows sudoku
     new = rows (update sudoku (i,j) val)
 
+-- hämta ut elementet
+-- få ut dess block, anropar isOkayBlock för varje block
 
 candidates :: Sudoku -> Pos -> [Int]
-candidates _ _ = undefined
+candidates sudoku pos = [ x | x<- [1..9], isOkay (update sudoku pos (Just x))]
 
 -------------------------------------------------------------------------
 
