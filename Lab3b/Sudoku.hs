@@ -121,9 +121,11 @@ type Pos = (Int,Int)
 
 blanks :: Sudoku -> [Pos]
 blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
-                    isNothing ((rows' !! i) !! j)]
-  where
-    rows' = rows sudoku
+                    isNothing ((rows sudoku !! i) !! j)]
+
+prop_blanks :: Sudoku -> Bool
+prop_blanks sudoku = all (\element -> isNothing (((rows sudoku) !! fst element) !! snd element)) (blanks sudoku)
+
 
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) xs (n,_) | n < 0 || n > (length xs - 1) =
