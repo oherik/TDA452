@@ -196,11 +196,11 @@ solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' sudoku (blanks su
   where
     solve' :: Sudoku -> [Pos] -> Maybe Sudoku
     solve' sudoku [] = Just sudoku
-    solve' sudoku (blank:bs) = if isJust ans then fromJust ans
-                              else Nothing
-      where
-        alts = [(update sudoku blank (Just x)) | x <- candidates sudoku blank]
-        ans = find isJust $ map (\ s -> solve' s bs)  alts -- TODO fråga: kommer denna brytas när första Justen hittas
+    solve' sudoku (blank:bs) = listToMaybe $ catMaybes $
+                                map (\ s -> solve' s bs)
+                                [(update sudoku blank (Just x))
+                                | x <- candidates sudoku blank]
+        -- TODO fråga: kommer denna brytas när första Justen hittas
 
 -- reading the Sudoku from the given file, solve it and print the answer
 readAndSolve :: FilePath -> IO ()
