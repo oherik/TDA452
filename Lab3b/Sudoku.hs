@@ -192,15 +192,16 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
-solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' [(sudoku,(blanks sudoku))]
+solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' sudoku (blanks sudoku)
               else Nothing
   where
-    solve' :: [(Sudoku,[Pos])] -> Maybe Sudoku
-    solve' [] = Nothing
-    solve' ((sudoku,[]):_) = Just sudoku
-    solve' ((sudoku,(blank:bs)):ss) = solve' $
-                [((update sudoku blank (Just x)),bs)
-                | x <- candidates sudoku blank] ++ ss
+    solve' :: Sudoku -> [Pos] -> Maybe Sudoku
+    solve' sudoku [] = Just sudoku
+    solve' sudoku (blank:bs) = if isJust ans then fromJust ans
+                              else Nothing
+      where
+        alts = [(update sudoku blank (Just x)) | x <- candidates sudoku blank]
+        ans = find isJust $ map (\ s -> solve' s bs)  alts
 
 readAndSolve :: FilePath -> IO ()
 readAndSolve _ = undefined
