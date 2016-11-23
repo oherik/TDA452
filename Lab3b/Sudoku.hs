@@ -215,5 +215,10 @@ readAndSolve path = do
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf _ _ = undefined
 
+-- Idé: list comprehension. Concata alla celler. Gå igenom alla, plocka element i från båda och kolla
+-- om antingen båda är samma eller om den från sudoku2 är Nothing
+
 prop_SolveSound :: Sudoku -> Property
 prop_SolveSound _ = undefined
+
+-- Idé: testa om solve något är isSolutionOf något
