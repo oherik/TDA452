@@ -200,7 +200,7 @@ solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' sudoku (blanks su
                               else Nothing
       where
         alts = [(update sudoku blank (Just x)) | x <- candidates sudoku blank]
-        ans = find isJust $ map (\ s -> solve' s bs)  alts
+        ans = find isJust $ map (\ s -> solve' s bs)  alts -- TODO fråga: kommer denna brytas när första Justen hittas
 
 -- reading the Sudoku from the given file, solve it and print the answer
 readAndSolve :: FilePath -> IO ()
