@@ -192,19 +192,15 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
-solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' [sudoku]
+solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' [(sudoku,(blanks sudoku))]
               else Nothing
   where
-    solve' :: [Sudoku] -> Maybe Sudoku
+    solve' :: [(Sudoku,[Pos])] -> Maybe Sudoku
     solve' [] = Nothing
-    solve' (sudoku:ss) | null blanks' = Just sudoku
-                  | null cand = solve' ss
-                  | otherwise =
-                      solve' $ [(update sudoku pos (Just x)) | x <- cand] ++ ss
-      where
-        blanks' = blanks sudoku
-        pos = head blanks'
-        cand = candidates sudoku pos
+    solve' ((sudoku,[]):_) = Just sudoku
+    solve' ((sudoku,(blank:bs)):ss) = solve' $
+                [((update sudoku blank (Just x)),bs)
+                | x <- candidates sudoku blank] ++ ss
 
 readAndSolve :: FilePath -> IO ()
 readAndSolve _ = undefined
