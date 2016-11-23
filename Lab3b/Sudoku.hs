@@ -174,8 +174,9 @@ prop_update' sudoku (i,j) val = prop_update sudoku
     validJ Nothing = Nothing
 
 
--- hämta ut elementet
--- få ut dess block, anropar isOkayBlock för varje block
+-- isOkPos checks if the change is valid for a certain position, chicking its
+-- row, column and 3x3 block. This saves time compared to running the isOkay
+-- on the whole sudoku
 
 candidates :: Sudoku -> Pos -> [Int]
 candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
@@ -191,7 +192,19 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
-solve _ = undefined
+solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' [sudoku]
+              else Nothing
+  where
+    solve' :: [Sudoku] -> Maybe Sudoku
+    solve' [] = Nothing
+    solve' (sudoku:ss) | null blanks' = Just sudoku
+                  | null cand = solve' ss
+                  | otherwise =
+                      solve' $ [(update sudoku pos (Just x)) | x <- cand] ++ ss
+      where
+        blanks' = blanks sudoku
+        pos = head blanks'
+        cand = candidates sudoku pos
 
 readAndSolve :: FilePath -> IO ()
 readAndSolve _ = undefined
