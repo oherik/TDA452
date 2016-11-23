@@ -177,7 +177,6 @@ prop_update' sudoku (i,j) val = prop_update sudoku
 -- isOkPos checks if the change is valid for a certain position, chicking its
 -- row, column and 3x3 block. This saves time compared to running the isOkay
 -- on the whole sudoku
-
 candidates :: Sudoku -> Pos -> [Int]
 candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
   where
@@ -202,8 +201,14 @@ solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' [(sudoku,(blanks 
                 [((update sudoku blank (Just x)),bs)
                 | x <- candidates sudoku blank] ++ ss
 
+-- reading the Sudoku from the given file, solve it and print the answer
 readAndSolve :: FilePath -> IO ()
-readAndSolve _ = undefined
+readAndSolve path = do
+                    sud <- readSudoku path
+                    let solvedSudoku = solve sud
+                    if isNothing solvedSudoku
+                      then error "(no solution)"
+                    else printSudoku (fromJust solvedSudoku)
 
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf _ _ = undefined
