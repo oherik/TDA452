@@ -191,7 +191,8 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
-solve sudoku = if isSudoku sudoku && isOkay sudoku then solve' sudoku (blanks sudoku)
+solve sudoku = if isSudoku sudoku && isOkay sudoku then
+                  solve' sudoku (blanks sudoku)
               else Nothing
   where
     solve' :: Sudoku -> [Pos] -> Maybe Sudoku
