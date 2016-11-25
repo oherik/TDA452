@@ -234,16 +234,17 @@ readAndSolve path = do
 
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf solution subject = isSudoku solution &&
-                                isSolved solution && and
+                                isSolved solution &&
+                                isOkay solution && and
                                   [s1 !! i == (s2 !! i) ||
                                   (s2 !! i == Nothing) | i <- [0..80]]
  where
    s1 = concat $ rows solution
    s2 = concat $ rows subject
--- Idé: list comprehension. Concata alla celler. Gå igenom alla, plocka element i från båda och kolla
--- om antingen båda är samma eller om den från sudoku2 är Nothing
 
 prop_SolveSound :: Sudoku -> Property
-prop_SolveSound _ = undefined
+prop_SolveSound sudoku = isSudoku sudoku &&
+                          not (isNothing (solve sudoku)) ==>
+                          (fromJust (solve sudoku) `isSolutionOf` sudoku)
 
 -- Idé: testa om solve något är isSolutionOf något
