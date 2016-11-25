@@ -187,15 +187,15 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
         blocks' = blocks sudoku'
         row = blocks' !! i
         col = blocks' !! (j+9)
-        block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
-
+        block = blocks' !! (j `div` 3 * 3 + i `div` 3 + 18)
+        
 candidates'  :: Sudoku -> Pos -> [Int]
 candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
   where
     blocks' = blocks sudoku
     row = blocks' !! i
     col = blocks' !! (j+9)
-    block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
+    block = blocks' !! (j `div` 3 * 3 + i `div` 3 + 18)
     values = row ++ col ++ block
 
 prop_candidates :: Sudoku -> Property
@@ -222,7 +222,7 @@ solve sudoku = if isSudoku sudoku && isOkay sudoku then
     solve' sudoku (blank:bs) = listToMaybe $ catMaybes $
                                 map (\ s -> solve' s bs)
                                 [(update sudoku blank (Just x))
-                                | x <- candidates' sudoku blank]
+                                | x <- candidates sudoku blank]
 
 -- reading the Sudoku from the given file, solve it and print the answer
 readAndSolve :: FilePath -> IO ()
