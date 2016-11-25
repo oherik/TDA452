@@ -119,12 +119,6 @@ isOkay sudoku = all isOkayBlock (blocks sudoku)
 
 type Pos = (Int,Int)
 
-allPos :: Gen Pos
-allPos =
-    do  i <- choose(0,8)
-        j <- choose(0,8)
-        return (i,j)
-
 -- Given a Sudoku returns a list of the positions of the blanks elements
 blanks :: Sudoku -> [Pos]
 blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
@@ -203,11 +197,11 @@ candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
     block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
     values = row ++ col ++ block
 
-prop_candidates :: Sudoku -> Pos -> Bool
-prop_candidates sudoku pos = all isOkay [update sudoku pos (Just i)
-                                | i <- candidates sudoku pos]
-prop_candidates' :: Sudoku -> Property
-prop_candidates' sudoku = forAll allPos (\ pos -> prop_candidates sudoku pos)
+prop_candidates :: Sudoku -> Pos -> Property
+prop_candidates sudoku (i,j) = (0<=i && i<=8 && 0<=j && j<=8) &&
+                                isOkay sudoku ==>
+                                all isOkay [update sudoku (i,j) (Just v)
+                                | v <- candidates sudoku (i,j)]
 
 -------------------------------------------------------------------------
 
