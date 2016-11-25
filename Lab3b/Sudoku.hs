@@ -201,7 +201,6 @@ solve sudoku = if isSudoku sudoku && isOkay sudoku then
                                 map (\ s -> solve' s bs)
                                 [(update sudoku blank (Just x))
                                 | x <- candidates sudoku blank]
-        -- TODO fråga: kommer denna brytas när första Justen hittas
 
 -- reading the Sudoku from the given file, solve it and print the answer
 readAndSolve :: FilePath -> IO ()
@@ -213,8 +212,13 @@ readAndSolve path = do
                     else printSudoku (fromJust solvedSudoku)
 
 isSolutionOf :: Sudoku -> Sudoku -> Bool
-isSolutionOf _ _ = undefined
-
+isSolutionOf solution subject = isSudoku solution &&
+                                isSolved solution && and
+                                  [s1 !! i == (s2 !! i) ||
+                                  (s2 !! i == Nothing) | i <- [0..80]]
+ where
+   s1 = concat $ rows solution
+   s2 = concat $ rows subject
 -- Idé: list comprehension. Concata alla celler. Gå igenom alla, plocka element i från båda och kolla
 -- om antingen båda är samma eller om den från sudoku2 är Nothing
 
