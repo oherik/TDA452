@@ -188,6 +188,16 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
         col = blocks' !! (j+9)
         block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
 
+candidates'  :: Sudoku -> Pos -> [Int]
+candidates' sudoku (i,j)  = [1..9] `intersect` (catMaybes values)
+  where
+    blocks' = blocks sudoku
+    row = blocks' !! i
+    col = blocks' !! (j+9)
+    block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
+    values = row ++ col ++ block
+
+
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
