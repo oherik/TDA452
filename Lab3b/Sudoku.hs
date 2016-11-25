@@ -8,7 +8,10 @@ import Data.List
 -------------------------------------------------------------------------
 
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
- deriving ( Show, Eq )
+ deriving (Eq)
+
+instance Show Sudoku where
+  show (Sudoku rows') = unlines [map (\ c -> if isNothing c then '.' else chr $ (fromJust c) + (ord '0'))row | row <- rows']
 
  -- TODO ta bort
 example :: Sudoku
