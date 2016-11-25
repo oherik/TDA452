@@ -119,6 +119,12 @@ isOkay sudoku = all isOkayBlock (blocks sudoku)
 
 type Pos = (Int,Int)
 
+rPos :: Gen Pos
+rPos = do i <- elements [0..8]
+          j <- elements [0..8]
+          return (i,j)
+
+
 -- Given a Sudoku returns a list of the positions of the blanks elements
 blanks :: Sudoku -> [Pos]
 blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
@@ -152,26 +158,18 @@ update sudoku (i,j) val = Sudoku $ rows' !!= (i,updated)
     rows' = rows sudoku
     updated = rows' !! i !!= (j,val)
 
-prop_update :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_update sudoku (i,j) val =
-                      isSudoku sudoku &&
-                      and [rows' !! n == (new !! n)
-                          | n <- [0..8], not (n==i)] &&
-                      and [rows' !! i !! m == (new !! i !! m)
-                          | m <- [0..8], not (m==j)] &&
-                      new !! i !! j == val
+prop_update :: Sudoku -> Maybe Int -> Property
+prop_update sudoku val = forAll rPos (\ x -> f x sudoku val)
   where
-    rows' = rows sudoku
-    new = rows (update sudoku (i,j) val)
-
--- TODO fråga om detta! Baka in denna i metoden ovan, eller hur ska man
--- annars få quickCheck att bara testa rätt värden?
-prop_update' :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_update' sudoku (i,j) val = prop_update sudoku
-                                (abs (mod i 9), abs (mod j 9)) (validJ val)
-  where
-    validJ (Just v) =  Just (abs (mod v 9) + 1)
-    validJ Nothing = Nothing
+    f (i,j) sudoku val = isSudoku sudoku &&
+                          and [rows' !! n == (new !! n)
+                              | n <- [0..8], not (n==i)] &&
+                          and [rows' !! i !! m == (new !! i !! m)
+                              | m <- [0..8], not (m==j)] &&
+                          new !! i !! j == val
+      where
+        rows' = rows sudoku
+        new = rows (update sudoku (i,j) val)
 
 
 -- isOkPos checks if the change is valid for a certain position, chicking its
