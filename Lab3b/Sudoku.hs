@@ -197,6 +197,9 @@ candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
     block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
     values = row ++ col ++ block
 
+prop_candidates :: Sudoku -> Pos -> Bool
+prop_candidates sudoku pos = all isOkay [update sudoku pos (Just i)
+                                | i <- candidates sudoku pos]
 
 -------------------------------------------------------------------------
 
