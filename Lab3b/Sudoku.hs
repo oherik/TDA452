@@ -124,7 +124,6 @@ rPos = do i <- elements [0..8]
           j <- elements [0..8]
           return (i,j)
 
-
 -- Given a Sudoku returns a list of the positions of the blanks elements
 blanks :: Sudoku -> [Pos]
 blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
@@ -159,9 +158,10 @@ update sudoku (i,j) val = Sudoku $ rows' !!= (i,updated)
     updated = rows' !! i !!= (j,val)
 
 prop_update :: Sudoku -> Maybe Int -> Property
-prop_update sudoku val = forAll rPos (\ x -> f x sudoku val)
+prop_update sudoku val = forAll rPos (\ pos -> prop_update' pos sudoku val)
   where
-    f (i,j) sudoku val = isSudoku sudoku &&
+    prop_update' :: Pos -> Sudoku -> Maybe Int -> Bool
+    prop_update' (i,j) sudoku val = isSudoku sudoku &&
                           and [rows' !! n == (new !! n)
                               | n <- [0..8], not (n==i)] &&
                           and [rows' !! i !! m == (new !! i !! m)
@@ -195,12 +195,18 @@ candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
     block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
     values = row ++ col ++ block
 
-prop_candidates :: Sudoku -> Pos -> Property
-prop_candidates sudoku (i,j) = (0<=i && i<=8 && 0<=j && j<=8) &&
-                                isOkay sudoku ==>
-                                all isOkay [update sudoku (i,j) (Just v)
-                                | v <- candidates sudoku (i,j)]
+prop_candidates :: Sudoku -> Property
+prop_candidates sudoku = isOkay sudoku ==>
+                        forAll rPos (\ pos -> prop_candidates' pos sudoku)
+  where
+    prop_candidates' :: Pos -> Sudoku -> Bool
+    prop_candidates' (i,j) sudoku = all isOkay [update sudoku (i,j)
+                  (Just v) | v <- candidates sudoku (i,j)]
 
+-- TODO if we want a random blank
+--                rBlank :: Sudoku -> Gen Pos
+--                  rBlank sudoku = do b <- elements $ blanks sudoku
+--                                 return b
 -------------------------------------------------------------------------
 
 solve :: Sudoku -> Maybe Sudoku
