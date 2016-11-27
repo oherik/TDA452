@@ -10,8 +10,12 @@ import Data.List
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
  deriving (Eq)
 
+-- Custom function to display a sudoku the way it's printed in
+-- the lab assignment.
 instance Show Sudoku where
-  show (Sudoku rows') = unlines [map (\ c -> if isNothing c then '.' else chr $ (fromJust c) + (ord '0'))row | row <- rows']
+  show (Sudoku rows') = unlines [map (\ c -> if isNothing c then '.'
+                                        else chr $ (fromJust c) +
+                                        (ord '0'))row | row <- rows']
 
  -- TODO ta bort
 example :: Sudoku
@@ -45,7 +49,7 @@ isSudoku sudoku = and ([length rows' == 9, (all (==9) . map length) rows'] ++
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
-isSolved sudoku = all (all (not . isNothing)) (rows sudoku)
+isSolved sudoku = all (all (not . isNothing)) $ rows sudoku
 
 -------------------------------------------------------------------------
 
@@ -116,12 +120,14 @@ prop_SudokuBlocks sudoku = length blocks' == 27 &&
 -- Given a Sudoku, checks that everything does not
 -- contain the same digit twice
 isOkay :: Sudoku -> Bool
-isOkay sudoku = all isOkayBlock (blocks sudoku)
+isOkay sudoku = all isOkayBlock $ blocks sudoku
 
 -------------------------------------------------------------------------
 
 type Pos = (Int,Int)
 
+-- A position generator, creating a position between (0,0) and (8,8).
+-- Used for quickcheck testing
 rPos :: Gen Pos
 rPos = do i <- elements [0..8]
           j <- elements [0..8]
@@ -134,8 +140,8 @@ blanks sudoku =  [(i,j) | i <- [0..8], j<- [0..8],
 
 -- Proprtery that states that all cells in the blanks list are blanks
 prop_blanks :: Sudoku -> Bool
-prop_blanks sudoku = all (\element -> isNothing (((rows sudoku) !! fst element) !! snd element)) (blanks sudoku)
-
+prop_blanks sudoku = all (\element -> isNothing (((rows sudoku) !!
+                        fst element) !! snd element)) (blanks sudoku)
 
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) xs (n,_) | n < 0 || n > (length xs - 1) =
@@ -172,7 +178,7 @@ prop_update sudoku val = forAll rPos (\ pos -> prop_update' pos sudoku val)
                           new !! i !! j == val
       where
         rows' = rows sudoku
-        new = rows (update sudoku (i,j) val)
+        new = rows $ update sudoku (i,j) val
 
 
 -- isOkPos checks if the change is valid for a certain position, chicking its
@@ -188,7 +194,7 @@ candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just 
         row = blocks' !! i
         col = blocks' !! (j+9)
         block = blocks' !! (j `div` 3 * 3 + i `div` 3 + 18)
-        
+
 candidates'  :: Sudoku -> Pos -> [Int]
 candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
   where
@@ -198,13 +204,15 @@ candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
     block = blocks' !! (j `div` 3 * 3 + i `div` 3 + 18)
     values = row ++ col ++ block
 
+-- Makes sure that all candidates given by an "okay" sudoku are valid
 prop_candidates :: Sudoku -> Property
 prop_candidates sudoku = isOkay sudoku ==>
                         forAll rPos (\ pos -> prop_candidates' pos sudoku)
   where
     prop_candidates' :: Pos -> Sudoku -> Bool
     prop_candidates' (i,j) sudoku = all isOkay [update sudoku (i,j)
-                  (Just v) | v <- candidates sudoku (i,j)]
+                                        (Just v) | v <-
+                                        candidates sudoku (i,j)]
 
 -- TODO if we want a random blank
 --                rBlank :: Sudoku -> Gen Pos
@@ -212,6 +220,7 @@ prop_candidates sudoku = isOkay sudoku ==>
 --                                 return b
 -------------------------------------------------------------------------
 
+-- Recursively solves a sudoku
 solve :: Sudoku -> Maybe Sudoku
 solve sudoku = if isSudoku sudoku && isOkay sudoku then
                   solve' sudoku (blanks sudoku)
@@ -248,4 +257,4 @@ prop_SolveSound sudoku = isSudoku sudoku &&
                           not (isNothing (solve sudoku)) ==>
                           (fromJust (solve sudoku) `isSolutionOf` sudoku)
 
--- Idé: testa om solve något är isSolutionOf något
+fewerChecks prop = quickCheckWith stdArgs{ maxSuccess = 30 } prop
