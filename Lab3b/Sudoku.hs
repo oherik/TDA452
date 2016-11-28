@@ -214,10 +214,11 @@ readAndSolve path = do
 -- and if the first one is a solution of the second one
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf solution subject = isSudoku solution &&
+                                isSudoku subject &&
                                 isSolved solution &&
                                 isOkay solution && and
-                                  [s1 !! i == (s2 !! i) ||
-                                  (s2 !! i == Nothing) | i <- [0..80]]
+                                (zipWith (\a b -> a == b || isNothing b) 
+                                s1 s2)
  where
    s1 = concat $ rows solution
    s2 = concat $ rows subject
