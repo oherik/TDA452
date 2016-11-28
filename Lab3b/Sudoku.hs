@@ -142,6 +142,8 @@ prop_blanks :: Sudoku -> Bool
 prop_blanks sudoku = all (\element -> isNothing (((rows sudoku) !!
                         fst element) !! snd element)) (blanks sudoku)
 
+-- Given a list and a tuple and a new value.
+-- Updates the given list with the new value at the given index.
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) xs (n,_) | n < 0 || n > (length xs - 1) =
                         error "Index out of bounds"
@@ -159,12 +161,16 @@ prop_replace xs (n,x) = length xs == length rep &&
                 where
                   rep = xs !!= (n,x)
 
+-- Given a Sudoku, a position and a new cell value.
+--Update the given Sudoku with the new value in the given position.
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update sudoku (i,j) val = Sudoku $ rows' !!= (i,updated)
   where
     rows' = rows sudoku
     updated = rows' !! i !!= (j,val)
 
+-- Property that checks that the updated
+--position really has gotten the new value
 prop_update :: Sudoku -> Maybe Int -> Property
 prop_update sudoku val = forAll rPos (\ pos -> prop_update' pos sudoku val)
   where
@@ -230,6 +236,8 @@ readAndSolve path = do
                       then error "(no solution)"
                     else printSudoku (fromJust solvedSudoku)
 
+-- Given two Sudokus, checks if the first one is a solution
+-- and if the first one is a solution of the second one
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf solution subject = isSudoku solution &&
                                 isSolved solution &&
@@ -240,9 +248,9 @@ isSolutionOf solution subject = isSudoku solution &&
    s1 = concat $ rows solution
    s2 = concat $ rows subject
 
+-- Property that states if the function solve is sound.
+-- Soundness means that the output from solve is a valid solution.
 prop_SolveSound :: Sudoku -> Property
 prop_SolveSound sudoku = isSudoku sudoku &&
                           not (isNothing (solve sudoku)) ==>
                           (fromJust (solve sudoku) `isSolutionOf` sudoku)
-
-fewerChecks prop = quickCheckWith stdArgs{ maxSuccess = 30 } prop
