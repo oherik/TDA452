@@ -99,9 +99,8 @@ blocks :: Sudoku -> [Block]
 blocks sudoku = rows' ++ columns' ++ blocks'
   where rows' = (rows sudoku)
         columns' = transpose rows'
-        blocks' = [(concat [ take 3 (drop x row)
-                  | row <- take 3 (drop y rows')])
-                  | x <- [0, 3, 6], y <- [0,3,6]]
+        blocks' = [ square x y | x <- [0..2], y <- [0..2] ]
+        square x y = concat [ take 3 (drop (3*y) row) | row <- take 3 (drop (3*x) rows') ]
 
 -- Property that states that for each Sudoku,
 --there are 3*9 blocks and each block has exactly 9 cells
