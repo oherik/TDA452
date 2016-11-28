@@ -181,27 +181,16 @@ prop_update sudoku val = forAll rPos (\ pos -> prop_update' pos sudoku val)
         new = rows $ update sudoku (i,j) val
 
 
--- isOkPos checks if the change is valid for a certain position, chicking its
+-- isOkPos checks if the change is valid for a certain position, chiecking its
 -- row, column and 3x3 block. This saves time compared to running the isOkay
 -- on the whole sudoku
-candidates :: Sudoku -> Pos -> [Int]
-candidates sudoku (i,j) = [ x | x<- [1..9], isOkPos (update sudoku (i,j) (Just x))]
-  where
-    isOkPos :: Sudoku -> Bool
-    isOkPos sudoku' = all isOkayBlock [row, col, block]
-      where
-        blocks' = blocks sudoku'
-        row = blocks' !! i
-        col = blocks' !! (j+9)
-        block = blocks' !! (j `div` 3 * 3 + i `div` 3 + 18)
-
-candidates'  :: Sudoku -> Pos -> [Int]
-candidates' sudoku (i,j)  = [1..9] \\ (catMaybes values)
+candidates  :: Sudoku -> Pos -> [Int]
+candidates sudoku (i,j)  = [1..9] \\ (catMaybes values)
   where
     blocks' = blocks sudoku
     row = blocks' !! i
     col = blocks' !! (j+9)
-    block = blocks' !! (j `div` 3 * 3 + i `div` 3 + 18)
+    block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
     values = row ++ col ++ block
 
 -- Makes sure that all candidates given by an "okay" sudoku are valid
