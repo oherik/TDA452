@@ -17,24 +17,6 @@ instance Show Sudoku where
                                         else chr $ (fromJust c) +
                                         (ord '0'))row | row <- rows']
 
- -- TODO ta bort
-example :: Sudoku
-example =
-    Sudoku
-      [ [j 3,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
-      , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
-      , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
-      , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
-      , [j 4,n  ,n  ,j 5,n  ,j 2,n  ,n  ,j 9]
-      , [j 2,j 7,n  ,j 4,j 6,n  ,n  ,n  ,n  ]
-      , [n  ,n  ,j 5,j 3,n  ,j 8,j 9,n  ,n  ]
-      , [n  ,j 8,j 3,n  ,n  ,n  ,n  ,j 6,n  ]
-      , [n  ,n  ,j 7,j 6,j 9,n  ,n  ,j 4,j 3]
-      ]
-  where
-    n = Nothing
-    j = Just
-
 -- allBlankSudoku is a sudoku with just blanks
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku(replicate 9 (replicate 9 Nothing))
@@ -148,7 +130,6 @@ prop_blanks sudoku = all (\element -> isNothing (((rows sudoku) !!
 (!!=) xs (n,x) | otherwise = h ++ x:(drop 1 t)
   where (h,t) = splitAt n xs
 
--- TODO: Haskell won't accept the name prop_!!=
 -- Check that the length is the same, and that all values other than
 -- the chosen one is unaffected. The chosen one should be changed,
 prop_replace :: [Integer] -> (Int,Integer) -> Bool
@@ -184,13 +165,12 @@ prop_update sudoku val = forAll rPos (\ pos -> prop_update' pos sudoku val)
 -- row, column and 3x3 block. This saves time compared to running the isOkay
 -- on the whole sudoku
 candidates  :: Sudoku -> Pos -> [Int]
-candidates sudoku (i,j)  = [1..9] \\ (catMaybes values)
+candidates sudoku (i,j)  = [1..9] \\ catMaybes (row ++ col ++ block)
   where
     blocks' = blocks sudoku
     row = blocks' !! i
     col = blocks' !! (j+9)
     block = blocks' !! (i `div` 3 * 3 + j `div` 3 + 18)
-    values = row ++ col ++ block
 
 -- Makes sure that all candidates given by an "okay" sudoku are valid
 prop_candidates :: Sudoku -> Property
@@ -201,12 +181,6 @@ prop_candidates sudoku = isOkay sudoku ==>
     prop_candidates' (i,j) sudoku = all isOkay [update sudoku (i,j)
                                         (Just v) | v <-
                                         candidates sudoku (i,j)]
-
--- TODO if we want a random blank
---                rBlank :: Sudoku -> Gen Pos
---                  rBlank sudoku = do b <- elements $ blanks sudoku
---                                 return b
--------------------------------------------------------------------------
 
 -- Recursively solves a sudoku
 solve :: Sudoku -> Maybe Sudoku
