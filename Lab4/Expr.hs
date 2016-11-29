@@ -1,4 +1,5 @@
 
+
 --TODO should we have cos and sin as expressions?
 ---- B ----
 showExpr :: Expr -> String
@@ -19,8 +20,8 @@ showNum n | (n == fromIntegral (round n)) = show $ round n
           | otherwise = show n
 
 showMul :: Expr -> Expr -> String
-showMul (Num 0) _ = "0"
-showMul _ (Num 0) = "0"
+showMul (Num 0) _ = showFact (Num 0)
+showMul _ (Num 0) = showFact (Num 0)
 showMul (Num 1) e = showFact e
 showMul e (Num 1) = showFact e
 showMul (Var x) e = showFact e ++ "*" ++ showFact (Var x)
