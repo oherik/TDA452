@@ -1,3 +1,17 @@
+---- A ----
+
+data Expr = Num Double
+            | Var Char
+            | Opr Operators Expr Expr
+            | Func Functions Expr
+            deriving (Eq)
+
+data Operators = Mul | Add
+                deriving (Eq)
+
+data Functions = Sin | Cos
+                deriving (Eq)
+
 --TODO should we have cos and sin as expressions?
 ---- B ----
 --TODO test av fancy syntax
@@ -5,10 +19,10 @@ showExpr :: Expr -> String
 showExpr e = showSimplified $ simplified e
     where
       showSimplified :: Expr -> String
-      showSimplified Num n = showNum n
-      showSimplified Var v = v
-      showSimplified Func f e = showFun f e
-      showSimplified Opr op e1 e2 = showOpr op e1 e2
+      showSimplified (Num n) = showNum n
+      showSimplified (Var v) = [v]
+      showSimplified (Func f e) = showFun f e
+      showSimplified (Opr op e1 e2) = showOpr op e1 e2
 
 -- Simplifies an expression (eg (Add (Num 3) (Num 4)) becomes
 -- (Num 7))
@@ -73,3 +87,13 @@ sin' e          = Func Sin e
 cos' :: Expr -> Expr
 cos' (Num n)    = Num(cos n)
 cos' e          = Func Cos e
+
+---- C ----
+eval :: Expr -> Double -> Double
+--
+eval (Num n) _ = n
+eval (Var a) x = x
+eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
+eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
+eval (Func Sin e) x = sin (eval e x)
+eval (Func Cos e) x = cos (eval e x)
