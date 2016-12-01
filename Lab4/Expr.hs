@@ -14,7 +14,6 @@ data Functions = Sin | Cos
 
 
 ---- B ----
-
 showExpr :: Expr -> String
 showExpr e = showExpr' $ simplify e
     where
@@ -53,23 +52,25 @@ showArg (Num n) = showExpr (Num n)
 showArg (Var v) = showExpr (Var v)
 showArg e =  "(" ++ showExpr e ++ ")"
 
-
 ---- C ----
 
 eval :: Expr -> Double -> Double
-eval (Num n) _        = n
-eval (Var _) x        = x
-eval (Opr o e1 e2) x  = evalOpr o e1 e2 x
-eval (Func f e) x     = evalFunc f e x
+--
+eval (Num n) _ = n
+eval (Var a) x = x
+eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
+eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
+eval (Func Sin e) x = sin (eval e x)
+eval (Func Cos e) x = cos (eval e x)
 
-evalOpr :: Operators -> Expr -> Expr -> Double -> Double
-evalOpr Add e1 e2 x = (eval e1 x) + (eval e2 x)
-evalOpr Mul e1 e2 x = (eval e1 x) * (eval e2 x)
+---- D ----
+-- readExpr :: String -> Maybe Expr
+--
 
-evalFunc :: Functions -> Expr -> Double -> Double
-evalFunc Sin e x = sin (eval e x)
-evalFunc Cos e x = cos (eval e x)
-
+---- E ----
+-- prop_ShowReadExpr :: Expr -> Bool
+-- arbExpr :: Int -> Gen Expr
+--
 
 ---- F ----
 
@@ -108,3 +109,7 @@ sin' e          = Func Sin e
 cos' :: Expr -> Expr
 cos' (Num n)    = Num(cos n)
 cos' e          = Func Cos e
+
+---- G ----
+-- differentiate :: Expr -> Expr
+--
