@@ -1,4 +1,4 @@
-import Parsing
+-- import Parsing
 ---- A ----
 
 data Expr = Num Double
@@ -15,7 +15,6 @@ cos' = Function "cos" cos
 
 instance Show Expr where
   show = showExpr
-
 
 ---- B ----
 showExpr :: Expr -> String
@@ -110,5 +109,13 @@ add (Num n1) (Num n2) = Num (n1+n2)
 add e1 e2       = Opr Add e1 e2
 
 ---- G ----
--- differentiate :: Expr -> Expr
---
+differentiate :: Expr -> Expr
+differentiate (Num n) = Num 0
+differentiate (Var x) =  if x == 'x' then Num 1 else Num 0
+differentiate (Opr Add e1 e2) = Opr Add (differentiate e1) (differentiate e2)
+differentiate (Opr Mul e1 e2) = Opr Add (Opr Mul e1 (differentiate e2)) (Opr Mul (differentiate e1) e2)
+differentiate (Func f e) = Opr Mul (differentiateFun f e) (differentiate e)
+
+differentiateFun :: Function -> Expr -> Expr
+differentiateFun (Function "cos" _) e = Opr Mul (Num (-1)) (Func sin' e)
+differentiateFun (Function "sin" _) e = Func cos' e
