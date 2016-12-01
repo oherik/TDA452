@@ -97,3 +97,20 @@ eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
 eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
 eval (Func Sin e) x = sin (eval e x)
 eval (Func Cos e) x = cos (eval e x)
+
+---- D ----
+-- readExpr :: String -> Maybe Expr
+--
+
+---- E ----
+-- prop_ShowReadExpr :: Expr -> Bool
+-- arbExpr :: Int -> Gen Expr
+--
+
+---- F ----
+-- simplify :: Expr -> Expr
+--
+
+---- G ----
+-- differentiate :: Expr -> Expr
+--
