@@ -1,3 +1,4 @@
+import Parsing
 ---- A ----
 
 data Expr = Num Double
@@ -11,6 +12,10 @@ data Function = Function { name :: String, function :: (Double -> Double)}
 
 sin' = Function "sin" sin
 cos' = Function "cos" cos
+
+instance Show Expr where
+  show = showExpr
+
 
 ---- B ----
 showExpr :: Expr -> String
@@ -64,8 +69,8 @@ evalFun :: Function -> Expr -> Double -> Double
 evalFun (Function name f) e x = f $ eval e x
 
 ---- D ----
--- readExpr :: String -> Maybe Expr
---
+--readExpr :: String -> Maybe Expr
+
 
 ---- E ----
 -- prop_ShowReadExpr :: Expr -> Bool
