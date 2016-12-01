@@ -1,7 +1,7 @@
 ---- A ----
 
 data Expr = Num Double
-            | Var Char
+            | Var String
             | Opr Operators Expr Expr
             | Func Function Expr
             --deriving (Eq)
@@ -9,7 +9,6 @@ data Expr = Num Double
 data Operators = Mul | Add
           --      deriving (Eq)
 
--- A function is made up of a name and a function
 type Function = (String, (Double -> Double))
         --  deriving (Eq)
 
@@ -24,7 +23,7 @@ showExpr e = showSimplified $ simplified e
     where
       showSimplified :: Expr -> String
       showSimplified (Num n) = showNum n
-      showSimplified (Var v) = [v]
+      showSimplified (Var v) = v
       showSimplified (Func f e) = showFun f e
       showSimplified (Opr op e1 e2) = showOpr op e1 e2
 
