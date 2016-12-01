@@ -12,26 +12,18 @@ data Operators = Mul | Add
 data Functions = Sin | Cos
                 deriving (Eq)
 
---TODO should we have cos and sin as expressions?
----- B ----
---TODO test av fancy syntax
-showExpr :: Expr -> String
-showExpr e = showSimplified $ simplified e
-    where
-      showSimplified :: Expr -> String
-      showSimplified (Num n) = showNum n
-      showSimplified (Var v) = [v]
-      showSimplified (Func f e) = showFun f e
-      showSimplified (Opr op e1 e2) = showOpr op e1 e2
 
--- Simplifies an expression (eg (Add (Num 3) (Num 4)) becomes
--- (Num 7))
-simplified :: Expr -> Expr
-simplified (Opr Mul e1 e2) = mul (simplified e1) (simplified e2)
-simplified (Opr Add e1 e2) = add (simplified e1) (simplified e2)
-simplified (Func Sin e) = sin' (simplified e)
-simplified (Func Cos e) = cos' (simplified e)
-simplified e = e
+---- B ----
+
+showExpr :: Expr -> String
+showExpr e = showExpr' $ simplify e
+    where
+      showExpr' :: Expr -> String
+      showExpr' (Num n) = showNum n
+      showExpr' (Var v) = [v]
+      showExpr' (Func f e) = showFun f e
+      showExpr' (Opr op e1 e2) = showOpr op e1 e2
+
 
 -- Convert a numerical expression to a string
 -- Display numbers without decimal points if they are integers
@@ -61,6 +53,35 @@ showArg (Num n) = showExpr (Num n)
 showArg (Var v) = showExpr (Var v)
 showArg e =  "(" ++ showExpr e ++ ")"
 
+
+---- C ----
+
+eval :: Expr -> Double -> Double
+eval (Num n) _        = n
+eval (Var _) x        = x
+eval (Opr o e1 e2) x  = evalOpr o e1 e2 x
+eval (Func f e) x     = evalFunc f e x
+
+evalOpr :: Operators -> Expr -> Expr -> Double -> Double
+evalOpr Add e1 e2 x = (eval e1 x) + (eval e2 x)
+evalOpr Mul e1 e2 x = (eval e1 x) * (eval e2 x)
+
+evalFunc :: Functions -> Expr -> Double -> Double
+evalFunc Sin e x = sin (eval e x)
+evalFunc Cos e x = cos (eval e x)
+
+
+---- F ----
+
+-- Simplifies an expression (eg (Add (Num 3) (Num 4)) becomes
+-- (Num 7))
+simplify :: Expr -> Expr
+simplify (Opr Mul e1 e2) = mul (simplify e1) (simplify e2)
+simplify (Opr Add e1 e2) = add (simplify e1) (simplify e2)
+simplify (Func Sin e) = sin' (simplify e)
+simplify (Func Cos e) = cos' (simplify e)
+simplify e = e
+
 -- Simplifies a multiplication
 mul :: Expr -> Expr -> Expr
 mul (Num 0) _   = Num 0
@@ -87,13 +108,3 @@ sin' e          = Func Sin e
 cos' :: Expr -> Expr
 cos' (Num n)    = Num(cos n)
 cos' e          = Func Cos e
-
----- C ----
-eval :: Expr -> Double -> Double
---
-eval (Num n) _ = n
-eval (Var a) x = x
-eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
-eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
-eval (Func Sin e) x = sin (eval e x)
-eval (Func Cos e) x = cos (eval e x)
