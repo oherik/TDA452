@@ -51,7 +51,8 @@ showArg e@(Var _) = showExpr e
 showArg e =  "(" ++ showExpr e ++ ")"
 
 ---- C ----
-
+-- Given an expression and a value,
+-- Calculates the value of the expression
 eval :: Expr -> Double -> Double
 eval (Num n) _ = n
 eval (Var a) x = x
