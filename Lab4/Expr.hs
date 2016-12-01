@@ -89,6 +89,8 @@ cos' (Num n)    = Num(cos n)
 cos' e          = Func Cos e
 
 ---- C ----
+-- Given an expression and a value,
+-- Calculates the value of the expression
 eval :: Expr -> Double -> Double
 --
 eval (Num n) _ = n
@@ -99,6 +101,7 @@ eval (Func Sin e) x = sin (eval e x)
 eval (Func Cos e) x = cos (eval e x)
 
 ---- D ----
+-- Give aa string, tries to interpret and returns 
 -- readExpr :: String -> Maybe Expr
 --
 
