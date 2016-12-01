@@ -1,4 +1,6 @@
--- import Parsing
+import Parsing
+import Data.Char
+
 ---- A ----
 
 data Expr = Num Double
@@ -75,6 +77,60 @@ evalFun (Function name f) e x = f $ eval e x
 -- prop_ShowReadExpr :: Expr -> Bool
 -- arbExpr :: Int -> Gen Expr
 --
+
+expr, expr', func, term, term', factor, factor', int, doub, var :: Parser Expr
+expr = func <|> expr' <|> term
+expr'= do t <- term
+          char '+'
+          e <- expr
+          return (Opr Add t e)
+-- As of now, you must write the arguments to a function within
+-- parantheses
+func = do f <- funP
+          fac <- factor'
+          return (Func f fac)
+term = term' <|> factor
+term'=  do f <- factor
+           char '*'
+           t <- term
+           return (Opr Mul f t)
+
+factor = doub <|> int <|> factor' <|> func <|> var
+int = do n <- integer
+         return (Num (fromIntegral n))
+doub = do n <- integer
+          char '.'
+          d <- integer
+          let total = (show n) ++ "." ++ (show d)
+          return (Num (read total))
+var = do v <- charP
+         return (Var v)
+factor'= do char '('
+            e <- expr
+            char ')'
+            return e
+
+integer :: Parser Integer
+integer = do s <- oneOrMore digit
+             return (read s)
+
+charP :: Parser Char
+charP = sat isLetter
+
+stringP :: Parser String
+stringP = do s <- oneOrMore charP
+             return s
+
+funP, sinP, cosP :: Parser Function
+funP = sinP <|> cosP
+sinP = do s <- char 's'
+          i <- char 'i'
+          n <- char 'n'
+          return (Function "sin" sin)
+cosP = do c <- char 'c'
+          o <- char 'o'
+          s <- char 's'
+          return (Function "cos" cos)
 
 ---- F ----
 
