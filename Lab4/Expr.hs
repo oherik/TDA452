@@ -1,19 +1,16 @@
 ---- A ----
 
 data Expr = Num Double
-            | Var String
+            | Var Char
             | Opr Operators Expr Expr
-            | Func Function Expr
-            --deriving (Eq)
+            | Func Functions Expr
+            deriving (Eq)
 
 data Operators = Mul | Add
-          --      deriving (Eq)
+                deriving (Eq)
 
-type Function = (String, (Double -> Double))
-        --  deriving (Eq)
-
-cos' = ("cos", cos)
-sin' = ("sin", sin)
+data Functions = Sin | Cos
+                deriving (Eq)
 
 --TODO should we have cos and sin as expressions?
 ---- B ----
@@ -23,7 +20,7 @@ showExpr e = showSimplified $ simplified e
     where
       showSimplified :: Expr -> String
       showSimplified (Num n) = showNum n
-      showSimplified (Var v) = v
+      showSimplified (Var v) = [v]
       showSimplified (Func f e) = showFun f e
       showSimplified (Opr op e1 e2) = showOpr op e1 e2
 
@@ -32,7 +29,8 @@ showExpr e = showSimplified $ simplified e
 simplified :: Expr -> Expr
 simplified (Opr Mul e1 e2) = mul (simplified e1) (simplified e2)
 simplified (Opr Add e1 e2) = add (simplified e1) (simplified e2)
-simplified (Func f e) = fun f (simplified e)
+simplified (Func Sin e) = sin' (simplified e)
+simplified (Func Cos e) = cos' (simplified e)
 simplified e = e
 
 -- Convert a numerical expression to a string
@@ -42,8 +40,9 @@ showNum n | (n == fromIntegral (round n)) = show $ round n
           | otherwise = show n
 
 -- Convert a function expression to a string
-showFun :: Function -> Expr -> String
-showFun (name, f_) e = name ++ " " ++ showArg e
+showFun :: Functions -> Expr -> String
+showFun Cos e = "cos " ++ showArg e
+showFun Sin e = "sin " ++ showArg e
 
 -- Convert an operation expression to a string
 showOpr :: Operators -> Expr -> Expr -> String
@@ -80,9 +79,14 @@ add (Num n1) (Num n2) = Num (n1+n2)
 add e1 e2       = Opr Add e1 e2
 
 -- Simplifies a sin expression
-fun :: Function -> Expr -> Expr
-fun (name, f) (Num n) = Num(f n)
-fun f e               = Func f e
+sin' :: Expr -> Expr
+sin' (Num n)    = Num(sin n)
+sin' e          = Func Sin e
+
+-- Simplifies a cos expression
+cos' :: Expr -> Expr
+cos' (Num n)    = Num(cos n)
+cos' e          = Func Cos e
 
 ---- C ----
 eval :: Expr -> Double -> Double
@@ -91,4 +95,5 @@ eval (Num n) _ = n
 eval (Var a) x = x
 eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
 eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
-eval (Func (_,f) e) x = f (eval e x)
+eval (Func Sin e) x = sin (eval e x)
+eval (Func Cos e) x = cos (eval e x)
