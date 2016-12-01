@@ -3,15 +3,14 @@
 data Expr = Num Double
             | Var Char
             | Opr Operators Expr Expr
-            | Func Functions Expr
-            deriving (Eq)
+            | Func Function Expr
 
 data Operators = Mul | Add
-                deriving (Eq)
 
-data Functions = Sin | Cos
-                deriving (Eq)
+data Function = Function { name :: String, function :: (Double -> Double)}
 
+sin' = Function "sin" sin
+cos' = Function "cos" cos
 
 ---- B ----
 showExpr :: Expr -> String
@@ -31,9 +30,8 @@ showNum n | (n == fromIntegral (round n)) = show $ round n
           | otherwise = show n
 
 -- Convert a function expression to a string
-showFun :: Functions -> Expr -> String
-showFun Cos e = "cos " ++ showArg e
-showFun Sin e = "sin " ++ showArg e
+showFun :: Function -> Expr -> String
+showFun (Function name _) e = name ++ " " ++ showArg e
 
 -- Convert an operation expression to a string
 showOpr :: Operators -> Expr -> Expr -> String
@@ -42,26 +40,27 @@ showOpr Add e1 e2 = showExpr e1 ++ " + " ++ showExpr e2
 
 -- A factor that's an addition should have parentheses around it
 showFact :: Expr -> String
-showFact (Opr Add e1 e2) = "(" ++ showExpr (Opr Add e1 e2) ++ ")"
+showFact e@(Opr Add e1 e2) = "(" ++ showExpr e ++ ")"
 showFact e = showExpr e
 
 -- Arguments consisting of other functions or additions should have
 -- parantheses around them
 showArg :: Expr -> String
-showArg (Num n) = showExpr (Num n)
-showArg (Var v) = showExpr (Var v)
+showArg e@(Num _) = showExpr e
+showArg e@(Var _) = showExpr e
 showArg e =  "(" ++ showExpr e ++ ")"
 
 ---- C ----
 
 eval :: Expr -> Double -> Double
---
 eval (Num n) _ = n
 eval (Var a) x = x
 eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
 eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
-eval (Func Sin e) x = sin (eval e x)
-eval (Func Cos e) x = cos (eval e x)
+eval (Func f e) x = evalFun f e x
+
+evalFun :: Function -> Expr -> Double -> Double
+evalFun (Function name f) e x = f $ eval e x
 
 ---- D ----
 -- readExpr :: String -> Maybe Expr
@@ -79,9 +78,13 @@ eval (Func Cos e) x = cos (eval e x)
 simplify :: Expr -> Expr
 simplify (Opr Mul e1 e2) = mul (simplify e1) (simplify e2)
 simplify (Opr Add e1 e2) = add (simplify e1) (simplify e2)
-simplify (Func Sin e) = sin' (simplify e)
-simplify (Func Cos e) = cos' (simplify e)
+simplify (Func f e) = fun f (simplify e)
 simplify e = e
+
+-- Simplifies a function
+fun :: Function -> Expr -> Expr
+fun (Function _ f) (Num n) = Num (f n)
+fun f e = Func f e
 
 -- Simplifies a multiplication
 mul :: Expr -> Expr -> Expr
@@ -90,7 +93,7 @@ mul _ (Num 0)   = Num 0
 mul (Num 1) e   = e
 mul e (Num 1)   = e
 mul (Num n1) (Num n2) = Num (n1*n2)
-mul (Var x) e   = Opr Mul e (Var x)
+mul v@(Var x) e   = Opr Mul e v
 mul e1 e2       = Opr Mul e1 e2
 
 -- Simplifies an addition
@@ -99,16 +102,6 @@ add (Num 0) e   = e
 add e (Num 0)   = e
 add (Num n1) (Num n2) = Num (n1+n2)
 add e1 e2       = Opr Add e1 e2
-
--- Simplifies a sin expression
-sin' :: Expr -> Expr
-sin' (Num n)    = Num(sin n)
-sin' e          = Func Sin e
-
--- Simplifies a cos expression
-cos' :: Expr -> Expr
-cos' (Num n)    = Num(cos n)
-cos' e          = Func Cos e
 
 ---- G ----
 -- differentiate :: Expr -> Expr
