@@ -1,6 +1,7 @@
 import Parsing
 import Data.Char
 import Data.Maybe
+import Test.QuickCheck
 
 ---- A ----
 
@@ -135,10 +136,24 @@ cosP = do char 'c'
 
 ---- E ----
 -- prop_ShowReadExpr :: Expr -> Bool
--- arbExpr :: Int -> Gen Expr
---
 
+-- Only Num and Var count towards the length (excluding the remainder)
+arbExpr :: Int -> Gen Expr
+arbExpr size = frequency [(4,rNum),
+                (2,return (Var 'x')),(2*size,rOpr),(size,rFunc)]
+  where
+    rNum = elements [Num n | n <- [0..10] :: [Double]] -- TODO float values?
+    rOpr = do op <- elements [Add,Mul]
+              let size' = size `div` 2
+              left <- arbExpr size'
+              right <- arbExpr size'
+              return (Opr op left right)
+    rFunc = do fun <- elements [sin', cos']
+               arg <- arbExpr size
+               return (Func fun arg)
 
+instance Arbitrary Expr where
+  arbitrary = sized arbExpr
 ---- F ----
 
 -- Simplifies an expression (eg (Add (Num 3) (Num 4)) becomes
