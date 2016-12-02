@@ -149,6 +149,9 @@ simplify (Opr Add e1 e2) = add (simplify e1) (simplify e2)
 simplify (Func f e) = fun f (simplify e)
 simplify e = e
 
+prop_simplify :: Expr -> Double -> Bool
+prop_simplify e x = eval (simplify e) x == eval e x
+
 -- Simplifies a function
 fun :: Function -> Expr -> Expr
 fun (Function _ f) (Num n) = Num (f n)
