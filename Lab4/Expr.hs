@@ -1,5 +1,6 @@
 import Parsing
 import Data.Char
+import Data.Maybe
 
 ---- A ----
 
@@ -70,13 +71,10 @@ evalFun :: Function -> Expr -> Double -> Double
 evalFun (Function name f) e x = f $ eval e x
 
 ---- D ----
---readExpr :: String -> Maybe Expr
-
-
----- E ----
--- prop_ShowReadExpr :: Expr -> Bool
--- arbExpr :: Int -> Gen Expr
---
+readExpr :: String -> Maybe Expr
+readExpr s | rest == "" = Just e
+           | otherwise = Nothing
+  where (e,rest) = fromJust $ parse expr s
 
 expr, expr', func, func', func'', term, term', factor, factor', int, doub, var :: Parser Expr
 expr = func <|> expr' <|> term
@@ -134,6 +132,12 @@ cosP = do char 'c'
           char 'o'
           char 's'
           return (Function "cos" cos)
+
+---- E ----
+-- prop_ShowReadExpr :: Expr -> Bool
+-- arbExpr :: Int -> Gen Expr
+--
+
 
 ---- F ----
 
