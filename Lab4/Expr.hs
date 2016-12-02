@@ -78,24 +78,27 @@ evalFun (Function name f) e x = f $ eval e x
 -- arbExpr :: Int -> Gen Expr
 --
 
-expr, expr', func, term, term', factor, factor', int, doub, var :: Parser Expr
+expr, expr', func, func', func'', term, term', factor, factor', int, doub, var :: Parser Expr
 expr = func <|> expr' <|> term
 expr'= do t <- term
           char '+'
           e <- expr
           return (Opr Add t e)
--- As of now, you must write the arguments to a function within
--- parantheses
-func = do f <- funP
-          fac <- factor'
-          return (Func f fac)
+func = func' <|> func''
+func' = do f <- funP
+           fac <- factor'
+           return (Func f fac)
+func'' = do f <- funP
+            c <- char ' '
+            t <- term
+            return (Func f t)
 term = term' <|> factor
 term'=  do f <- factor
            char '*'
            t <- term
            return (Opr Mul f t)
 
-factor = doub <|> int <|> factor' <|> func <|> var
+factor = func <|> doub <|> int <|> factor' <|> var
 int = do n <- integer
          return (Num (fromIntegral n))
 doub = do n <- integer
