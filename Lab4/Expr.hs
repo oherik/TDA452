@@ -89,7 +89,7 @@ func' = do f <- funP
            fac <- factor'
            return (Func f fac)
 func'' = do f <- funP
-            c <- char ' '
+            char ' '
             t <- term
             return (Func f t)
 term = term' <|> factor
@@ -126,13 +126,13 @@ stringP = do s <- oneOrMore charP
 
 funP, sinP, cosP :: Parser Function
 funP = sinP <|> cosP
-sinP = do s <- char 's'
-          i <- char 'i'
-          n <- char 'n'
+sinP = do char 's'
+          char 'i'
+          char 'n'
           return (Function "sin" sin)
-cosP = do c <- char 'c'
-          o <- char 'o'
-          s <- char 's'
+cosP = do char 'c'
+          char 'o'
+          char 's'
           return (Function "cos" cos)
 
 ---- F ----
