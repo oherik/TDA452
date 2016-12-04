@@ -9,13 +9,18 @@ data Expr = Num Double
             | Var Char
             | Opr Operators Expr Expr
             | Func Function Expr
+            deriving(Eq)
 
 data Operators = Mul | Add
+          deriving(Eq)
 
 data Function = Function { name :: String, function :: (Double -> Double)}
 
 sin' = Function "sin" sin
 cos' = Function "cos" cos
+
+instance Eq Function where
+   (Function name1 _) == (Function name2 _) = name1 == name2
 
 instance Show Expr where
   show = showExpr
@@ -135,7 +140,8 @@ cosP = do char 'c'
           return (Function "cos" cos)
 
 ---- E ----
--- prop_ShowReadExpr :: Expr -> Bool
+prop_ShowReadExpr :: Expr -> Bool
+prop_ShowReadExpr ex = (fromJust $ readExpr (showExpr ex)) == ex
 
 -- Only Num and Var count towards the length (excluding the remainder)
 arbExpr :: Int -> Gen Expr
