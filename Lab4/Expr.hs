@@ -206,3 +206,13 @@ differentiate (Func f e) = Opr Mul (differentiateFun f e) (differentiate e)
 differentiateFun :: Function -> Expr -> Expr
 differentiateFun (Function "cos" _) e = Opr Mul (Num (-1)) (Func sin' e)
 differentiateFun (Function "sin" _) e = Func cos' e
+
+
+---- Part 2 ----
+-- type Point = (Double, Double)
+
+---- H ----
+-- points :: Expr -> Double -> (Int,Int) -> [Point]
+
+---- I ----
+-- readAndDraw :: Elem -> Canvas -> IO ()
