@@ -144,15 +144,11 @@ cosP = do char 'c'
           return (Function "cos" cos)
 
 ---- E ----
-prop_ShowReadExpr :: Expr -> Property
-prop_ShowReadExpr ex = forAll rNum (\ x -> eval (fromJust (readExpr (showExpr ex))) x `almostEqual` eval ex x)
- where
-   almostEqual :: Double -> Double -> Bool
-   almostEqual x y = abs (x - y) < 0.001
+-- TODO do like this?
+prop_ShowReadExpr :: Expr -> Bool
+prop_ShowReadExpr ex = showExpr ex ==
+  (showExpr (fromJust ((readExpr (showExpr ex)))))
 
-rNum :: Gen Double
-rNum = do n <- arbitrary
-          return n
 -- Only Num and Var count towards the length (excluding the remainder)
 arbExpr :: Int -> Gen Expr
 arbExpr size = frequency [(4,rNum),
