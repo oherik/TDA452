@@ -27,7 +27,7 @@ instance Show Expr where
 
 ---- B ----
 showExpr :: Expr -> String
-showExpr e = showExpr' $ simplify e
+showExpr e = showExpr' e
     where
       showExpr' :: Expr -> String
       showExpr' (Num n) = showNum n
@@ -59,8 +59,8 @@ showFact e = showExpr e
 -- Arguments consisting of other functions or additions should have
 -- parantheses around them
 showArg :: Expr -> String
-showArg e@(Num _) = showExpr e
-showArg e@(Var _) = showExpr e
+showArg e@(Num _) =  showExpr e
+showArg e@(Var _) =  showExpr e
 showArg e =  "(" ++ showExpr e ++ ")"
 
 ---- C ----
@@ -82,40 +82,44 @@ readExpr s | rest == "" = Just e
            | otherwise = Nothing
   where (e,rest) = fromJust $ parse expr s
 
-expr, expr', func, func', func'', term, term', factor, factor', int, doub, var :: Parser Expr
-expr = func <|> expr' <|> term
+expr, expr', func, term, term', factor, factor', int, doub, var :: Parser Expr
+expr = expr' <|> term
 expr'= do t <- term
+          char ' '
           char '+'
+          char ' '
           e <- expr
           return (Opr Add t e)
-func = func' <|> func''
-func' = do f <- funP
-           fac <- factor'
-           return (Func f fac)
-func'' = do f <- funP
-            char ' '
-            t <- term
-            return (Func f t)
-term = term' <|> factor
+
+func = do f <- funP
+          char ' '
+          fac <- factor
+          return (Func f fac)
+
+term = term' <|> factor <|> func
 term'=  do f <- factor
            char '*'
            t <- term
            return (Opr Mul f t)
 
 factor = func <|> doub <|> int <|> factor' <|> var
+factor'= do char '('
+            e <- expr
+            char ')'
+            return e
+
 int = do n <- integer
          return (Num (fromIntegral n))
+
 doub = do n <- integer
           char '.'
           d <- integer
           let total = (show n) ++ "." ++ (show d)
           return (Num (read total))
+
 var = do v <- charP
          return (Var v)
-factor'= do char '('
-            e <- expr
-            char ')'
-            return e
+
 
 integer :: Parser Integer
 integer = do s <- oneOrMore digit
@@ -140,9 +144,15 @@ cosP = do char 'c'
           return (Function "cos" cos)
 
 ---- E ----
-prop_ShowReadExpr :: Expr -> Bool
-prop_ShowReadExpr ex = (fromJust $ readExpr (showExpr ex)) == ex
+prop_ShowReadExpr :: Expr -> Property
+prop_ShowReadExpr ex = forAll rNum (\ x -> eval (fromJust (readExpr (showExpr ex))) x `almostEqual` eval ex x)
+ where
+   almostEqual :: Double -> Double -> Bool
+   almostEqual x y = abs (x - y) < 0.001
 
+rNum :: Gen Double
+rNum = do n <- arbitrary
+          return n
 -- Only Num and Var count towards the length (excluding the remainder)
 arbExpr :: Int -> Gen Expr
 arbExpr size = frequency [(4,rNum),
