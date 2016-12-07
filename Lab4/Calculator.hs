@@ -4,6 +4,7 @@ import Haste hiding (eval)
 import Haste.DOM
 import Haste.Events
 import Haste.Graphics.Canvas
+import Data.Maybe
 
 import Pages
 
@@ -27,14 +28,13 @@ canHeight = 300
 -- reads expression from the given input element
 -- draws the graph on the given canvas
 readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw elem canvas = do
-                            expr <- readExpr $ fromJust $ getValue elem
-                            if isJust expr then path $ points $ expr 1 canWidth canHeight
+readAndDraw e canvas = do
+                            val <- getValue e
+                            let expr = readExpr (fromJust val)
+                            if isJust expr then render canvas $ stroke $ path $ points (fromJust expr) 100.0 canvasSize
                             else error "Invalid expression"
-                            --få ett expr
-                            -- om expr visa i min IO
-                            --annars error
-
+                            where
+                              canvasSize = (canWidth,canHeight)
 
 main = do
     -- Elements
@@ -67,9 +67,7 @@ main = do
       -- type Point = (Double, Double)
 
       ---- H ----
-<<<<<<< HEAD
-      -- points :: Expr -> Double -> (Int,Int) -> [Point]
-=======
+
 points :: Expr -> Double -> (Int,Int) -> [Point]
 points ex scale (width,height) =
   [(x, realToPix (eval ex (pixToReal x)))| x <- [0..wPix-1]]
@@ -85,4 +83,3 @@ points ex scale (width,height) =
 
       ---- I ----
       -- readAndDraw :: Elem -> Canvas -> IO ()
->>>>>>> 02567df30d836d02fa527ce5debd378dedc5de1a
