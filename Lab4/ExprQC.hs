@@ -1,5 +1,3 @@
-module ExprQC where
-
 import Expr
 import Test.QuickCheck
 import Data.Maybe
