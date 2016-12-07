@@ -81,21 +81,22 @@ evalFun (Function name f) e x = f $ eval e x
 readExpr :: String -> Maybe Expr
 readExpr s | rest == "" = Just e
            | otherwise = Nothing
-  where (e,rest) = fromJust $ parse expr s
+  where
+    noSpace = [c | c <- s, not (c == ' ')]
+    (e,rest) = fromJust $ parse expr noSpace
 
 expr, expr', func, term, term', factor, factor', int, doub, var :: Parser Expr
 expr = expr' <|> term
 expr'= do t <- term
-          string " + "
+          char '+'
           e <- expr
           return (Opr Add t e)
 
 func = do f <- funP
-          char ' '
           fac <- factor
           return (Func f fac)
 
-term = term' <|> factor <|> func
+term = term' <|> factor
 term'=  do f <- factor
            char '*'
            t <- term
@@ -107,22 +108,14 @@ factor'= do char '('
             char ')'
             return e
 
-int = do n <- integer
-         return (Num (fromIntegral n))
+int = do s <- oneOrMore digit
+         return (Num (read s))
 
-doub = do n <- integer
-          char '.'
-          d <- integer
-          let total = (show n) ++ "." ++ (show d)
-          return (Num (read total))
+doub = do a <- readsP ::  Parser Double
+          return (Num (a))
 
 var = do v <- charP
          return (Var v)
-
-
-integer :: Parser Integer
-integer = do s <- oneOrMore digit
-             return (read s)
 
 charP :: Parser Char
 charP = sat isLetter
