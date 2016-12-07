@@ -29,7 +29,7 @@ canHeight = 300
 readAndDraw :: Elem -> Canvas -> IO ()
 readAndDraw elem canvas = do
                             expr <- readExpr $ fromJust $ getValue elem
-                            if isJust expr then show $ points $ expr 1 canWidth canHeight
+                            if isJust expr then path $ points $ expr 1 canWidth canHeight
                             else error "Invalid expression"
                             --få ett expr
                             -- om expr visa i min IO
@@ -67,4 +67,22 @@ main = do
       -- type Point = (Double, Double)
 
       ---- H ----
+<<<<<<< HEAD
       -- points :: Expr -> Double -> (Int,Int) -> [Point]
+=======
+points :: Expr -> Double -> (Int,Int) -> [Point]
+points ex scale (width,height) =
+  [(x, realToPix (eval ex (pixToReal x)))| x <- [0..wPix-1]]
+  where
+    hPix = fromIntegral height / scale
+    wPix = fromIntegral width / scale
+    -- converts a pixel x-coordinate to a real x-coordinate
+    pixToReal :: Double -> Double
+    pixToReal x = (x * scale) - (fromIntegral width / 2)
+    -- converts a real y-coordinate to a pixel y-coordinate
+    realToPix :: Double -> Double
+    realToPix y = negate ((y + fromIntegral height / 2) / scale) + hPix
+
+      ---- I ----
+      -- readAndDraw :: Elem -> Canvas -> IO ()
+>>>>>>> 02567df30d836d02fa527ce5debd378dedc5de1a
