@@ -85,7 +85,7 @@ readExpr s | rest == "" = Just e
     noSpace = [c | c <- s, not (c == ' ')]
     (e,rest) = fromJust $ parse expr noSpace
 
-expr, expr', func, term, term', factor, factor', int, doub, var :: Parser Expr
+expr, expr', func, term, term', factor, factor', num, var :: Parser Expr
 expr = expr' <|> term
 expr'= do t <- term
           char '+'
@@ -102,27 +102,20 @@ term'=  do f <- factor
            t <- term
            return (Opr Mul f t)
 
-factor = func <|> doub <|> int <|> factor' <|> var
+factor = func <|> num <|> factor' <|> var
 factor'= do char '('
             e <- expr
             char ')'
             return e
 
-int = do s <- oneOrMore digit
-         return (Num (read s))
-
-doub = do a <- readsP ::  Parser Double
-          return (Num (a))
+num = do a <- readsP ::  Parser Double
+         return (Num (a))
 
 var = do v <- charP
          return (Var v)
 
 charP :: Parser Char
 charP = sat isLetter
-
-stringP :: Parser String
-stringP = do s <- oneOrMore charP
-             return s
 
 funP, sinP, cosP :: Parser Function
 funP = sinP <|> cosP
