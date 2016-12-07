@@ -77,7 +77,7 @@ points ex scale (width,height) =
     pixToReal x = ((x - (fromIntegral width / 2)) * scale)
     -- converts a real y-coordinate to a pixel y-coordinate
     realToPix :: Double -> Double
-    realToPix y = negate ((y) / scale + fromIntegral height / 2)  + (fromIntegral height * scale)
+    realToPix y = negate ((y) / scale + fromIntegral height / 2)  + fromIntegral height
 
       ---- I ----
       -- readAndDraw :: Elem -> Canvas -> IO ()
