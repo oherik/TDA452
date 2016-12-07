@@ -14,8 +14,27 @@ import Expr
 canWidth  = 300
 canHeight = 300
 
+
+---- I ----
+
+-- parseElemToExpr :: Elem -> Maybe Expr
+-- parseElemToExpr elem = do
+--                       expr <- getValue elem
+--                       if isJust expr
+--                       then
+--                       else error "Invalid expression"
+
+-- reads expression from the given input element
+-- draws the graph on the given canvas
 readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw = undefined
+readAndDraw elem canvas = do
+                            expr <- readExpr $ fromJust $ getValue elem
+                            if isJust expr then show $ points $ expr 1 canWidth canHeight
+                            else error "Invalid expression"
+                            --få ett expr
+                            -- om expr visa i min IO
+                            --annars error
+
 
 main = do
     -- Elements
@@ -42,13 +61,10 @@ main = do
     Just can <- getCanvas canvas
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
-      -- "Enter" key has code 13      
+      -- "Enter" key has code 13
 
       ---- Part 2 ----
       -- type Point = (Double, Double)
 
       ---- H ----
       -- points :: Expr -> Double -> (Int,Int) -> [Point]
-
-      ---- I ----
-      -- readAndDraw :: Elem -> Canvas -> IO ()
