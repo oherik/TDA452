@@ -85,9 +85,7 @@ readExpr s | rest == "" = Just e
 expr, expr', func, term, term', factor, factor', int, doub, var :: Parser Expr
 expr = expr' <|> term
 expr'= do t <- term
-          char ' '
-          char '+'
-          char ' '
+          string " + "
           e <- expr
           return (Opr Add t e)
 
@@ -134,14 +132,16 @@ stringP = do s <- oneOrMore charP
 
 funP, sinP, cosP :: Parser Function
 funP = sinP <|> cosP
-sinP = do char 's'
-          char 'i'
-          char 'n'
+sinP = do string "sin"
           return (Function "sin" sin)
-cosP = do char 'c'
-          char 'o'
-          char 's'
+cosP = do string "cos"
           return (Function "cos" cos)
+
+string :: String -> Parser String
+string [] = return ("")
+string (x:xs) = do  first <- char x
+                    others <- (string xs)
+                    return (first:others)
 
 ---- E ----
 -- TODO do like this?
