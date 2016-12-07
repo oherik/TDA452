@@ -70,16 +70,14 @@ main = do
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
 points ex scale (width,height) =
-  [(x, realToPix (eval ex (pixToReal x)))| x <- [0..wPix-1]]
+  [(x, realToPix (eval ex (pixToReal x)))| x <- [0..(fromIntegral width-1)]]
   where
-    hPix = fromIntegral height / scale
-    wPix = fromIntegral width / scale
     -- converts a pixel x-coordinate to a real x-coordinate
     pixToReal :: Double -> Double
-    pixToReal x = (x * scale) - (fromIntegral width / 2)
+    pixToReal x = ((x - (fromIntegral width / 2)) * scale)
     -- converts a real y-coordinate to a pixel y-coordinate
     realToPix :: Double -> Double
-    realToPix y = negate ((y + fromIntegral height / 2) / scale) + hPix
+    realToPix y = negate ((y) / scale + fromIntegral height / 2)  + (fromIntegral height * scale)
 
       ---- I ----
       -- readAndDraw :: Elem -> Canvas -> IO ()
