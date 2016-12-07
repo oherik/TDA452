@@ -42,13 +42,24 @@ main = do
     Just can <- getCanvas canvas
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
-      -- "Enter" key has code 13      
+      -- "Enter" key has code 13
 
       ---- Part 2 ----
       -- type Point = (Double, Double)
 
       ---- H ----
-      -- points :: Expr -> Double -> (Int,Int) -> [Point]
+points :: Expr -> Double -> (Int,Int) -> [Point]
+points ex scale (width,height) =
+  [(x, realToPix (eval ex (pixToReal x)))| x <- [0..wPix-1]]
+  where
+    hPix = fromIntegral height / scale
+    wPix = fromIntegral width / scale
+    -- converts a pixel x-coordinate to a real x-coordinate
+    pixToReal :: Double -> Double
+    pixToReal x = (x * scale) - (fromIntegral width / 2)
+    -- converts a real y-coordinate to a pixel y-coordinate
+    realToPix :: Double -> Double
+    realToPix y = negate ((y + fromIntegral height / 2) / scale) + hPix
 
       ---- I ----
       -- readAndDraw :: Elem -> Canvas -> IO ()
