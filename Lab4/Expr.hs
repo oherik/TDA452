@@ -82,7 +82,7 @@ readExpr :: String -> Maybe Expr
 readExpr s | rest == "" = Just e
            | otherwise = Nothing
   where
-    noSpace = filter (not . (\c -> c == ' ')) s
+    noSpace = filter (\c -> c /= ' ') s
     (e,rest) = fromJust $ parse expr noSpace
 
 expr, expr', func, term, term', factor, factor', num, var :: Parser Expr
