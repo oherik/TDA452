@@ -69,7 +69,7 @@ showArg e =  "(" ++ showExpr e ++ ")"
 -- Calculates the value of the expression
 eval :: Expr -> Double -> Double
 eval (Num n) _ = n
-eval (Var a) x = x
+eval (Var _) x = x
 eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
 eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
 eval (Func f e) x = evalFun f e x
@@ -82,7 +82,7 @@ readExpr :: String -> Maybe Expr
 readExpr s | rest == "" = Just e
            | otherwise = Nothing
   where
-    noSpace = [c | c <- s, not (c == ' ')]
+    noSpace = filter (not . (\c -> c == ' ')) s
     (e,rest) = fromJust $ parse expr noSpace
 
 expr, expr', func, term, term', factor, factor', num, var :: Parser Expr
