@@ -9,6 +9,7 @@ import Data.Maybe
 import Pages
 
 import Expr
+import Parsing
 
 
 
@@ -28,10 +29,10 @@ canHeight = 300
 -- reads expression from the given input element
 -- draws the graph on the given canvas
 readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw e canvas = do
-                            val <- getValue e
-                            let expr = readExpr (fromJust val)
-                            if isJust expr then render canvas $ stroke $ path $ points (fromJust expr) 100.0 canvasSize
+readAndDraw e canvas = do   val <- getProp e "value"
+                            let expr = readExpr val
+                            if isJust expr then
+                              render canvas $ stroke $ path $ points (fromJust expr) 0.1 canvasSize
                             else error "Invalid expression"
                             where
                               canvasSize = (canWidth,canHeight)
@@ -67,10 +68,8 @@ main = do
       -- type Point = (Double, Double)
 
       ---- H ----
-
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points ex scale (width,height) =
-  [(x, realToPix (eval ex (pixToReal x)))| x <- [0..(fromIntegral width-1)]]
+points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x)))) [0..(fromIntegral width)]
   where
     -- converts a pixel x-coordinate to a real x-coordinate
     pixToReal :: Double -> Double

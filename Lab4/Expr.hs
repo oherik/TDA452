@@ -127,7 +127,7 @@ cosP = do string "cos"
 string :: String -> Parser String
 string [] = return ("")
 string (x:xs) = do  first <- char x
-                    others <- (string xs)
+                    others <- string xs
                     return (first:others)
 
 ---- E ----
