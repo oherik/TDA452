@@ -158,7 +158,9 @@ mul _ (Num 0)   = Num 0
 mul (Num 1) e   = e
 mul e (Num 1)   = e
 mul (Num n1) (Num n2) = Num (n1*n2)
-mul v@(Var x) e   = Opr Mul e v
+mul v@(Var _) e   = Opr Mul e v
+mul f@(Func _ _) e  = Opr Mul e f
+mul n@(Num n1) (Opr Mul e1 e2) = mul (mul n e1) e2  -- TODO funkar detta tro?
 mul e1 e2       = Opr Mul e1 e2
 
 -- Simplifies an addition
