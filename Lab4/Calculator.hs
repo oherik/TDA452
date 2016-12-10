@@ -86,11 +86,5 @@ points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x))
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
-                            let ex    = readExpr val
-                            let diff  = differentiate $ fromJust ex
-                            _ <- setProp e "value" (showExpr diff)
-                            if isJust ex then
-                              render canvas $ stroke $ path $ points diff 0.1 canvasSize
-                            else error "Invalid expression"
-                            where
-                              canvasSize = (canWidth,canHeight)
+                            _ <- setProp e "value" (showExpr (differentiate (fromJust (readExpr val))))
+                            readAndDraw e canvas
