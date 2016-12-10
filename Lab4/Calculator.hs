@@ -43,13 +43,17 @@ main = do
     fx      <- mkHTML "<i>f</i>(<i>x</i>)="  -- The text "f(x)="
     input   <- mkInput 20 "x"                -- The formula input
     draw    <- mkButton "Draw graph"         -- The draw button
+    diff    <- mkButton "Differentiate"      -- The differentiate button
+
       -- The markup "<i>...</i>" means that the text inside should be rendered
       -- in italics.
 
     -- Layout
     formula <- mkDiv
+    buttons <- mkDiv
     row formula [fx,input]
-    column documentBody [canvas,formula,draw]
+    row buttons [draw,diff]
+    column documentBody [canvas,formula,buttons]
 
     -- Styling
     setStyle documentBody "backgroundColor" "lightblue"
@@ -62,6 +66,7 @@ main = do
     Just can <- getCanvas canvas
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
+    onEvent diff  Click $ \_    -> readAndDiff  input can
       -- "Enter" key has code 13
 
       ---- Part 2 ----
@@ -78,5 +83,14 @@ points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x))
     realToPix :: Double -> Double
     realToPix y = negate ((y) / scale + fromIntegral height / 2)  + fromIntegral height
 
-      ---- I ----
-      -- readAndDraw :: Elem -> Canvas -> IO ()
+---- K ----
+readAndDiff :: Elem -> Canvas -> IO ()
+readAndDiff e canvas = do   val <- getProp e "value"
+                            let ex    = readExpr val
+                            let diff  = differentiate $ fromJust ex
+                            _ <- setProp e "value" (showExpr diff)
+                            if isJust ex then
+                              render canvas $ stroke $ path $ points diff 0.1 canvasSize
+                            else error "Invalid expression"
+                            where
+                              canvasSize = (canWidth,canHeight)
