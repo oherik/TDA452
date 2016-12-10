@@ -89,5 +89,5 @@ points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x))
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
-                            _ <- setProp e "value" (showExpr (differentiate (fromJust (readExpr val))))
+                            _ <- setProp e "value" $ showExpr $ simplify $ differentiate $ fromJust $ readExpr val
                             readAndDraw e canvas
