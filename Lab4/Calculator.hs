@@ -33,7 +33,10 @@ readAndDraw e canvas = do   val <- getProp e "value"
                             let expr = readExpr val
                             if isJust expr then
                               render canvas $ stroke $ path $ points (fromJust expr) 0.1 canvasSize
-                            else error "Invalid expression"
+                            else
+                              do
+                                _ <- setProp e "value" "Invalid input"
+                                render canvas $ stroke $ path []
                             where
                               canvasSize = (canWidth,canHeight)
 
