@@ -17,29 +17,6 @@ canWidth  = 300
 canHeight = 300
 
 
----- I ----
-
--- parseElemToExpr :: Elem -> Maybe Expr
--- parseElemToExpr elem = do
---                       expr <- getValue elem
---                       if isJust expr
---                       then
---                       else error "Invalid expression"
-
--- reads expression from the given input element
--- draws the graph on the given canvas
-readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw e canvas = do   val <- getProp e "value"
-                            let expr = readExpr val
-                            if isJust expr then
-                              render canvas $ stroke $ path $ points (fromJust expr) 0.1 canvasSize
-                            else
-                              do
-                                _ <- setProp e "value" "Invalid input"
-                                render canvas $ stroke $ path []
-                            where
-                              canvasSize = (canWidth,canHeight)
-
 main = do
     -- Elements
     canvas  <- mkCanvas canWidth canHeight   -- The drawing area
@@ -47,6 +24,8 @@ main = do
     input   <- mkInput 20 "x"                -- The formula input
     draw    <- mkButton "Draw graph"         -- The draw button
     diff    <- mkButton "Differentiate"      -- The differentiate button
+    zoomI    <- mkButton "zoom in"      -- The differentiate button
+    zoomO    <- mkButton "zoom out"      -- The differentiate button
 
       -- The markup "<i>...</i>" means that the text inside should be rendered
       -- in italics.
@@ -55,7 +34,7 @@ main = do
     formula <- mkDiv
     buttons <- mkDiv
     row formula [fx,input]
-    row buttons [draw,diff]
+    row buttons [draw,diff, zoomI, zoomO]
     column documentBody [canvas,formula,buttons]
 
     -- Styling
@@ -85,6 +64,25 @@ points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x))
     -- converts a real y-coordinate to a pixel y-coordinate
     realToPix :: Double -> Double
     realToPix y = negate ((y) / scale + fromIntegral height / 2)  + fromIntegral height
+
+---- I ----
+-- reads expression from the given input element
+-- draws the graph on the given canvas
+readAndDraw :: Elem -> Canvas -> IO ()
+readAndDraw e canvas = do   val <- getProp e "value"
+                            let expr = readExpr val
+                            if isJust expr then
+                              render canvas $ stroke $ path $ points (fromJust expr) 0.1 canvasSize
+                            else
+                              do
+                                _ <- setProp e "value" "Invalid input"
+                                render canvas $ stroke $ path []
+                            where
+                              canvasSize = (canWidth,canHeight)
+
+---- J ----
+-- zoomIO :: Elem -> Canvas -> IO ()
+-- zoomIO e canvas =
 
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
