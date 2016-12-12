@@ -93,13 +93,12 @@ zoomIO e scale zoomstep canvas = do  currScale <- getProp scale "value"
                                      set scale
                                           [ prop "value" =: show zoomScale]
                                      drawWithScale (fromJust expr) canvas zoomScale
-
-
-drawWithScale :: Expr -> Canvas -> Double -> IO ()
-drawWithScale expr canvas zoomstep =
-                           render canvas $ stroke $ path $ points expr zoomstep canvasSize
-                           where
-                             canvasSize = (canWidth,canHeight)
+                                     where 
+                                        drawWithScale :: Expr -> Canvas -> Double -> IO ()
+                                        drawWithScale expr canvas zoomstep =
+                                                                   render canvas $ stroke $ path $ points expr zoomstep canvasSize
+                                                                   where
+                                                                     canvasSize = (canWidth,canHeight)
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
