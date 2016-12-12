@@ -24,8 +24,9 @@ main = do
     input   <- mkInput 20 "x"                -- The formula input
     draw    <- mkButton "Draw graph"         -- The draw button
     diff    <- mkButton "Differentiate"      -- The differentiate button
-    zoomI    <- mkButton "zoom in"      -- The differentiate button
-    zoomO    <- mkButton "zoom out"      -- The differentiate button
+    zoomI    <- mkButton "Zoom in"      -- The differentiate button
+    zoomO    <- mkButton "Zoom out"      -- The differentiate button
+    scale    <- mkInput 20 "0.1"      -- The default scale
 
       -- The markup "<i>...</i>" means that the text inside should be rendered
       -- in italics.
@@ -45,10 +46,13 @@ main = do
     select input
 
     -- Interaction
-    Just can <- getCanvas canvas
+    Just can <- fromElem canvas
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
     onEvent diff  Click $ \_    -> readAndDiff  input can
+    onEvent zoomO Click $ \_    -> zoomIO input scale (0.01) can
+    onEvent zoomI Click $ \_    -> zoomIO input scale (-0.01) can
+
       -- "Enter" key has code 13
 
       ---- Part 2 ----
@@ -81,9 +85,21 @@ readAndDraw e canvas = do   val <- getProp e "value"
                               canvasSize = (canWidth,canHeight)
 
 ---- J ----
--- zoomIO :: Elem -> Canvas -> IO ()
--- zoomIO e canvas =
+zoomIO :: Elem -> Elem -> Double -> Canvas -> IO()
+zoomIO e scale zoomstep canvas = do  currScale <- getProp scale "value"
+                                     val <- getProp e "value"
+                                     let expr = readExpr val
+                                     let zoomScale = zoomstep + (read currScale)
+                                     set scale
+                                          [ prop "value" =: show zoomScale]
+                                     drawWithScale (fromJust expr) canvas zoomScale
 
+
+drawWithScale :: Expr -> Canvas -> Double -> IO ()
+drawWithScale expr canvas zoomstep =
+                           render canvas $ stroke $ path $ points expr zoomstep canvasSize
+                           where
+                             canvasSize = (canWidth,canHeight)
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
