@@ -50,8 +50,8 @@ main = do
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
     onEvent diff  Click $ \_    -> readAndDiff  input can
-    onEvent zoomO Click $ \_    -> zoomIO input scale (0.01) can
-    onEvent zoomI Click $ \_    -> zoomIO input scale (-0.01) can
+    onEvent zoomO Click $ \_    -> zoomIO input scale (3/4) can
+    onEvent zoomI Click $ \_    -> zoomIO input scale (4/3) can
 
       -- "Enter" key has code 13
 
@@ -90,11 +90,11 @@ readAndDrawScaled e canvas scale = do val <- getProp e "value"
 
 ---- J ----
 zoomIO :: Elem -> Elem -> Double -> Canvas -> IO()
-zoomIO e scale zoomstep canvas = do  currScale <- getProp scale "value"
-                                     let zoomScale = zoomstep + (read currScale)
-                                     set scale
+zoomIO e scale zoomFactor canvas = do currScale <- getProp scale "value"
+                                      let zoomScale = (read currScale)/zoomFactor
+                                      set scale
                                           [ prop "value" =: show zoomScale]
-                                     readAndDrawScaled e canvas zoomScale
+                                      readAndDrawScaled e canvas zoomScale
 
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
