@@ -56,18 +56,19 @@ main = do
       -- "Enter" key has code 13
 
       ---- Part 2 ----
-      -- type Point = (Double, Double)
-
       ---- H ----
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x)))) [0..(fromIntegral width)]
+points ex scale (width,height) = map (\x ->
+                                      (x,realToPix (eval ex (pixToReal x))))
+                                      [0..(fromIntegral width)]
   where
     -- converts a pixel x-coordinate to a real x-coordinate
     pixToReal :: Double -> Double
     pixToReal x = ((x - (fromIntegral width / 2)) * scale)
     -- converts a real y-coordinate to a pixel y-coordinate
     realToPix :: Double -> Double
-    realToPix y = negate ((y) / scale + fromIntegral height / 2)  + fromIntegral height
+    realToPix y = negate ((y) / scale + fromIntegral height / 2)
+                                        + fromIntegral height
 
 ---- I ----
 -- reads expression from the given input element
@@ -80,7 +81,8 @@ readAndDrawScaled :: Elem -> Canvas -> Double -> IO ()
 readAndDrawScaled e canvas scale = do val <- getProp e "value"
                                       let expr = readExpr val
                                       if isJust expr then
-                                        render canvas $ stroke $ path $ points (fromJust expr) scale canvasSize
+                                        render canvas $ stroke $ path $
+                                        points (fromJust expr) scale canvasSize
                                       else
                                         do
                                           _ <- setProp e "value" "Invalid input"
@@ -99,5 +101,6 @@ zoomIO e scale zoomFactor canvas = do currScale <- getProp scale "value"
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
-                            _ <- setProp e "value" $ showExpr $ simplify $ differentiate $ fromJust $ readExpr val
+                            _ <- setProp e "value" $ showExpr $ simplify $
+                                        differentiate $ fromJust $ readExpr val
                             readAndDraw e canvas
