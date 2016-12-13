@@ -73,11 +73,12 @@ eval (Var _) x = x
 eval (Opr Add e1 e2) x = (eval e1 x) + (eval e2 x)
 eval (Opr Mul e1 e2) x = (eval e1 x) * (eval e2 x)
 eval (Func f e) x = evalFun f e x
-
-evalFun :: Function -> Expr -> Double -> Double
-evalFun (Function name f) e x = f $ eval e x
+  where
+    evalFun :: Function -> Expr -> Double -> Double
+    evalFun (Function _ f) e x = f $ eval e x
 
 ---- D ----
+-- Parse a string, sorting out all spaces.
 readExpr :: String -> Maybe Expr
 readExpr s | rest == "" = Just e
            | otherwise = Nothing
@@ -114,9 +115,11 @@ num = do a <- readsP ::  Parser Double
 var = do v <- charP
          return (Var v)
 
+-- Parse if a character is a letter
 charP :: Parser Char
 charP = sat isLetter
 
+-- Parse a predefined function
 funP, sinP, cosP :: Parser Function
 funP = sinP <|> cosP
 sinP = do string "sin"
@@ -124,8 +127,9 @@ sinP = do string "sin"
 cosP = do string "cos"
           return (Function "cos" cos)
 
+-- Parse a word
 string :: String -> Parser String
-string [] = return ("")
+string [] = return ""
 string (x:xs) = do  first <- char x
                     others <- string xs
                     return (first:others)
@@ -151,7 +155,8 @@ fun :: Function -> Expr -> Expr
 fun (Function _ f) (Num n) = Num (f n)
 fun f e = Func f e
 
--- Simplifies a multiplication
+-- Simplifies a multiplication. Changes the order to make it more readable, eg
+-- x*3 becomes 3*x
 mul :: Expr -> Expr -> Expr
 mul (Num 0) _   = Num 0
 mul _ (Num 0)   = Num 0
@@ -160,8 +165,8 @@ mul e (Num 1)   = e
 mul (Num n1) (Num n2) = Num (n1*n2)
 mul v@(Var _) e   = mul e v
 mul f@(Func _ _) n@(Num _)  = mul n f
-mul n@(Num n1) (Opr Mul e1 e2) = mul (mul n e1) e2  -- TODO funkar detta tro?
-mul n@(Num n1) (Opr Add e1 e2) = add (mul n e1) (mul n e2)  -- TODO funkar detta tro?
+mul n@(Num n1) (Opr Mul e1 e2) = mul (mul n e1) e2
+mul n@(Num n1) (Opr Add e1 e2) = add (mul n e1) (mul n e2)
 mul e1 e2       = Opr Mul e1 e2
 
 -- Simplifies an addition
@@ -175,13 +180,14 @@ add e1 (Opr Add e2 e3) | e1 == e2 = add (mul (Num 2) e1) e3
 add e1 e2       = Opr Add e1 e2
 
 ---- G ----
+-- Differentiates an express with respect to x
 differentiate :: Expr -> Expr
 differentiate (Num n) = Num 0
 differentiate (Var x) =  if x == 'x' then Num 1 else Num 0
 differentiate (Opr Add e1 e2) = Opr Add (differentiate e1) (differentiate e2)
 differentiate (Opr Mul e1 e2) = Opr Add (Opr Mul e1 (differentiate e2)) (Opr Mul (differentiate e1) e2)
 differentiate (Func f e) = Opr Mul (differentiateFun f e) (differentiate e)
-
-differentiateFun :: Function -> Expr -> Expr
-differentiateFun (Function "cos" _) e = Opr Mul (Num (-1)) (Func sin' e)
-differentiateFun (Function "sin" _) e = Func cos' e
+  where
+    differentiateFun :: Function -> Expr -> Expr
+    differentiateFun (Function "cos" _) e = Opr Mul (Num (-1)) (Func sin' e)
+    differentiateFun (Function "sin" _) e = Func cos' e
