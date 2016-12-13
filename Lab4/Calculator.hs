@@ -72,33 +72,30 @@ points ex scale (width,height) = map (\x -> (x,realToPix (eval ex (pixToReal x))
 ---- I ----
 -- reads expression from the given input element
 -- draws the graph on the given canvas
+-- 0.1 is the default zoom factor, showing values from [-10,10]
 readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw e canvas = do   val <- getProp e "value"
-                            let expr = readExpr val
-                            if isJust expr then
-                              render canvas $ stroke $ path $ points (fromJust expr) 0.1 canvasSize
-                            else
-                              do
-                                _ <- setProp e "value" "Invalid input"
-                                render canvas $ stroke $ path []
-                            where
-                              canvasSize = (canWidth,canHeight)
+readAndDraw e canvas = readAndDrawScaled e canvas 0.1
+
+readAndDrawScaled :: Elem -> Canvas -> Double -> IO ()
+readAndDrawScaled e canvas scale = do val <- getProp e "value"
+                                      let expr = readExpr val
+                                      if isJust expr then
+                                        render canvas $ stroke $ path $ points (fromJust expr) scale canvasSize
+                                      else
+                                        do
+                                          _ <- setProp e "value" "Invalid input"
+                                          render canvas $ stroke $ path []
+                                      where
+                                        canvasSize = (canWidth,canHeight)
 
 ---- J ----
 zoomIO :: Elem -> Elem -> Double -> Canvas -> IO()
 zoomIO e scale zoomstep canvas = do  currScale <- getProp scale "value"
-                                     val <- getProp e "value"
-                                     let expr = readExpr val
                                      let zoomScale = zoomstep + (read currScale)
                                      set scale
                                           [ prop "value" =: show zoomScale]
-                                     drawWithScale (fromJust expr) canvas zoomScale
-                                     where 
-                                        drawWithScale :: Expr -> Canvas -> Double -> IO ()
-                                        drawWithScale expr canvas zoomstep =
-                                                                   render canvas $ stroke $ path $ points expr zoomstep canvasSize
-                                                                   where
-                                                                     canvasSize = (canWidth,canHeight)
+                                     readAndDrawScaled e canvas zoomScale
+
 ---- K ----
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
