@@ -57,6 +57,7 @@ main = do
 
       ---- Part 2 ----
       ---- H ----
+-- Calculates all points of the graph in terms of pixels
 points :: Expr -> Double -> (Int,Int) -> [Point]
 points ex scale (width,height) = map (\x ->
                                       (x,realToPix (eval ex (pixToReal x))))
@@ -71,12 +72,14 @@ points ex scale (width,height) = map (\x ->
                                         + fromIntegral height
 
 ---- I ----
--- reads expression from the given input element
--- draws the graph on the given canvas
+-- Calls readAndDrawScaled with scale 0.1, in order to read the input
+-- and draw it to the canvas
 -- 0.1 is the default zoom factor, showing values from [-10,10]
 readAndDraw :: Elem -> Canvas -> IO ()
 readAndDraw e canvas = readAndDrawScaled e canvas 0.1
 
+-- reads expression from the given input element
+-- draws the input to the given canvas with the given scale
 readAndDrawScaled :: Elem -> Canvas -> Double -> IO ()
 readAndDrawScaled e canvas scale = do val <- getProp e "value"
                                       let expr = readExpr val
@@ -91,6 +94,8 @@ readAndDrawScaled e canvas scale = do val <- getProp e "value"
                                         canvasSize = (canWidth,canHeight)
 
 ---- J ----
+-- Zooms in or zooms out the canvas with the given zoomFactor by
+-- updating the scale-variable and calling readAndDrawScaled with the given zoomScale
 zoomIO :: Elem -> Elem -> Double -> Canvas -> IO()
 zoomIO e scale zoomFactor canvas = do currScale <- getProp scale "value"
                                       let zoomScale = (read currScale)/zoomFactor
@@ -99,6 +104,7 @@ zoomIO e scale zoomFactor canvas = do currScale <- getProp scale "value"
                                       readAndDrawScaled e canvas zoomScale
 
 ---- K ----
+-- Display the differentiated expression and its graph
 readAndDiff :: Elem -> Canvas -> IO ()
 readAndDiff e canvas = do   val <- getProp e "value"
                             _ <- setProp e "value" $ showExpr $ simplify $
